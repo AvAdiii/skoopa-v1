@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -52,16 +53,14 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
-				}
+				// Skoopa custom colors
+				'coral': '#FF6B6B',
+				'sapphire': '#0A2342',
+				'gold': '#FFD93D',
+				'azure': '#D3E7FF',
+				'smoke': '#E8E8E8',
+				'charcoal': '#2A2A2A',
+				'steel': '#6C757D',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +83,20 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'shimmer': {
+					'0%': { backgroundPosition: '-500px 0' },
+					'100%': { backgroundPosition: '500px 0' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'shimmer': 'shimmer 2s infinite linear'
+			},
+			backgroundImage: {
+				'indian-pattern': "url('/patterns/indian-pattern.svg')",
+				'dot-pattern': "repeating-radial-gradient(circle at 10px 10px, rgba(0,0,0,0.05) 0, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 10px)"
 			}
 		}
 	},
