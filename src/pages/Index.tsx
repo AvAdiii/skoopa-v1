@@ -1,13 +1,16 @@
 
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import CustomerBottomNav from "@/components/CustomerBottomNav";
 import HomeLocationHeader from "@/components/HomeLocationHeader";
-import MaidCard from "@/components/MaidCard";
 import PromoCarousel from "@/components/PromoCarousel";
 import QuickActions from "@/components/QuickActions";
 import SearchInput from "@/components/SearchInput";
 import ServiceCategory from "@/components/ServiceCategory";
 import SkoopaLogo from "@/components/SkoopaLogo";
-import TopMaids from "@/components/TopMaids";
+import UserGreeting from "@/components/UserGreeting";
+import ActiveBooking from "@/components/ActiveBooking";
 
 // Mock data for services
 const REGULAR_SERVICES = [
@@ -42,38 +45,122 @@ const REGULAR_SERVICES = [
   },
 ];
 
+const PREMIUM_SERVICES = [
+  {
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M2 20h20"/>
+        <path d="M12 16v4"/>
+        <path d="M4 20v-8a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8"/>
+        <path d="M12 7V4"/>
+      </svg>
+    ),
+    title: "Deep Cleaning",
+    description: "Thorough cleaning of your entire home, removing stubborn dirt and stains.",
+    price: "899",
+    duration: "4 hours",
+    popular: true,
+  }
+];
+
+interface MaidInfo {
+  name: string;
+  rating: number;
+  imageUrl: string;
+}
+
+interface BookingInfo {
+  serviceType: string;
+  time: string;
+  arrivalTime: string;
+  address: string;
+  maid: MaidInfo;
+}
+
 const Index = () => {
+  const navigate = useNavigate();
+  const [activeBooking, setActiveBooking] = useState<BookingInfo | null>(null);
+  
+  useEffect(() => {
+    // Check if there's a booking in localStorage
+    const storedBookings = localStorage.getItem("skoopa-bookings");
+    if (storedBookings) {
+      try {
+        const bookings = JSON.parse(storedBookings);
+        if (bookings.length > 0) {
+          // Set the most recent booking as active
+          setActiveBooking(bookings[0]);
+        }
+      } catch (e) {
+        console.error("Error parsing bookings from localStorage", e);
+      }
+    }
+  }, []);
+  
+  const handleSearch = (query: string) => {
+    console.log("Search query:", query);
+    // In a real app, this would navigate to search results with the query
+  };
+  
   return (
     <div className="pb-20">
       {/* Header with Logo */}
-      <div className="sticky top-0 z-40 bg-white py-3 px-4 border-b border-smoke">
+      <motion.div 
+        className="sticky top-0 z-40 bg-white py-3 px-4 border-b border-smoke"
+        initial={{ y: -50 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5, type: "spring" }}
+      >
         <div className="flex justify-center">
           <SkoopaLogo />
         </div>
-      </div>
+      </motion.div>
 
       <div className="px-4 py-3">
         {/* Location Header */}
         <HomeLocationHeader />
+        
+        {/* Greeting */}
+        <UserGreeting className="mt-6" />
 
         {/* Search */}
-        <SearchInput className="mt-4" />
+        <SearchInput className="mt-4" onSearch={handleSearch} />
 
-        {/* Promo Carousel */}
-        <PromoCarousel />
+        {/* Main Content Section */}
+        <motion.div 
+          className="mt-6 pt-6 px-4 -mx-4 rounded-t-3xl bg-gradient-to-b from-azure/20 to-white"
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
+          {/* Promo Carousel */}
+          <PromoCarousel />
 
-        {/* Quick Actions */}
-        <QuickActions />
+          {/* Quick Actions */}
+          <QuickActions />
 
-        {/* Top Maids Horizontal Scroll */}
-        <TopMaids />
-
-        {/* Service Categories */}
-        <ServiceCategory
-          title="Regular Services"
-          services={REGULAR_SERVICES}
-        />
+          {/* Service Categories */}
+          <ServiceCategory
+            title="Regular Services"
+            services={REGULAR_SERVICES}
+          />
+          
+          <ServiceCategory
+            title="Premium Services"
+            services={PREMIUM_SERVICES}
+          />
+        </motion.div>
       </div>
+
+      {/* Active Booking */}
+      <AnimatePresence>
+        {activeBooking && (
+          <ActiveBooking 
+            booking={activeBooking} 
+            onClose={() => setActiveBooking(null)} 
+          />
+        )}
+      </AnimatePresence>
 
       {/* Bottom Navigation */}
       <CustomerBottomNav />
