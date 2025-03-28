@@ -35,18 +35,23 @@ const App = () => {
         console.error("Error parsing user data", e);
       }
     }
-
-    // Hide splash screen after a delay
-    const timer = setTimeout(() => {
-      setShowSplash(false);
-    }, 2500);
-
-    return () => clearTimeout(timer);
   }, []);
+
+  const handleSplashFinish = () => {
+    setShowSplash(false);
+  };
 
   // If splash screen is showing, only render that
   if (showSplash) {
-    return <SplashScreen />;
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner position="top-center" />
+          <SplashScreen onFinish={handleSplashFinish} />
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
   }
 
   return (

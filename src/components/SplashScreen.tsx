@@ -1,11 +1,13 @@
 
 import { useEffect, useState } from "react";
 import SkoopaLogo from "./SkoopaLogo";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
-const SplashScreen = () => {
-  const navigate = useNavigate();
+interface SplashScreenProps {
+  onFinish: () => void;
+}
+
+const SplashScreen = ({ onFinish }: SplashScreenProps) => {
   const [showLogo, setShowLogo] = useState(false);
 
   useEffect(() => {
@@ -13,13 +15,13 @@ const SplashScreen = () => {
     const logoTimer = setTimeout(() => setShowLogo(true), 300);
     
     // Navigate to login after animation completes
-    const navTimer = setTimeout(() => navigate("/login"), 2500);
+    const navTimer = setTimeout(() => onFinish(), 2500);
     
     return () => {
       clearTimeout(logoTimer);
       clearTimeout(navTimer);
     };
-  }, [navigate]);
+  }, [onFinish]);
 
   return (
     <div className="h-screen w-full bg-white flex items-center justify-center overflow-hidden">

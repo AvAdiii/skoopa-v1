@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Calendar, Clock, Home, MapPin, ChevronRight, CreditCard } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Home, MapPin, ChevronRight, CreditCard, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
