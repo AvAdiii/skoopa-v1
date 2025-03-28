@@ -30,7 +30,7 @@ const App = () => {
     if (user) {
       try {
         const userData = JSON.parse(user);
-        setIsLoggedIn(userData.isLoggedIn);
+        setIsLoggedIn(!!userData.isLoggedIn);
       } catch (e) {
         console.error("Error parsing user data", e);
       }

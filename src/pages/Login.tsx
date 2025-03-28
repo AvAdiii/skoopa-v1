@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -48,7 +47,11 @@ const Login = () => {
     }));
     
     toast.success("Login successful!");
-    navigate("/");
+    
+    // Add a short delay to allow the toast to be seen before navigation
+    setTimeout(() => {
+      window.location.href = "/"; // Using direct location change instead of navigate
+    }, 800);
   };
 
   const staggerVariants = {
