@@ -33,6 +33,29 @@ const ProfileItem = ({ icon, label, value, onClick }: { icon: React.ReactNode, l
 };
 
 const Profile = () => {
+  const handleLogout = () => {
+    // Clear user data from localStorage
+    localStorage.removeItem("skoopa-user");
+    
+    // Redirect to login page
+    window.location.href = "/login";
+  };
+
+  // Get user data
+  const getUserData = () => {
+    try {
+      const userData = localStorage.getItem("skoopa-user");
+      if (userData) {
+        return JSON.parse(userData);
+      }
+    } catch (error) {
+      console.error("Error parsing user data", error);
+    }
+    return { firstName: "Guest", lastName: "", phoneNumber: "" };
+  };
+
+  const user = getUserData();
+
   return (
     <div className="pb-20">
       {/* Header */}
@@ -56,8 +79,8 @@ const Profile = () => {
           <div className="w-20 h-20 rounded-full bg-azure flex items-center justify-center text-sapphire mb-3">
             <User size={36} />
           </div>
-          <h2 className="text-xl font-bold text-charcoal">Ravi Kumar</h2>
-          <p className="text-steel">+91 98765 43210</p>
+          <h2 className="text-xl font-bold text-charcoal">{`${user.firstName} ${user.lastName}`}</h2>
+          <p className="text-steel">{user.phoneNumber}</p>
           <button className="mt-3 py-1.5 px-4 rounded-full border border-coral text-coral text-sm font-medium hover:bg-coral/5 transition-colors">
             Edit Profile
           </button>
@@ -124,7 +147,10 @@ const Profile = () => {
         </ProfileSection>
 
         {/* Logout */}
-        <button className="w-full flex items-center justify-center gap-2 py-3 mt-6 bg-white rounded-lg border border-red-300 text-red-500 font-medium hover:bg-red-50 transition-colors">
+        <button 
+          className="w-full flex items-center justify-center gap-2 py-3 mt-6 bg-white rounded-lg border border-red-300 text-red-500 font-medium hover:bg-red-50 transition-colors"
+          onClick={handleLogout}
+        >
           <LogOut size={18} />
           <span>Logout</span>
         </button>

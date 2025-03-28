@@ -46,12 +46,8 @@ const Login = () => {
       isLoggedIn: true
     }));
     
-    toast.success("Login successful!");
-    
-    // Add a short delay to allow the toast to be seen before navigation
-    setTimeout(() => {
-      window.location.href = "/"; // Using direct location change instead of navigate
-    }, 800);
+    // Directly navigate without showing success toast
+    window.location.href = "/";
   };
 
   const staggerVariants = {
