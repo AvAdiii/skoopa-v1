@@ -18,10 +18,10 @@ const CustomerBottomNav = () => {
 
   return (
     <motion.nav 
-      className="fixed bottom-0 left-0 right-0 bg-white border-t border-smoke z-50"
+      className="fixed bottom-0 left-0 right-0 bg-white border-t border-smoke z-50 shadow-lg"
       initial={{ y: 100 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.3, type: "spring", stiffness: 260, damping: 20 }}
     >
       <div className="flex justify-between items-center px-2">
         {navItems.map((item) => (
@@ -42,16 +42,31 @@ const CustomerBottomNav = () => {
                 transition={{ type: "spring", duration: 0.5 }}
               />
             )}
-            <item.icon
-              size={24}
-              className={cn(
-                "transition-transform", 
-                isActive(item.path) ? "text-coral scale-110" : "text-steel"
-              )}
-            />
+            <motion.div
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ y: -2 }}
+              transition={{ duration: 0.2 }}
+            >
+              <item.icon
+                size={24}
+                className={cn(
+                  "transition-transform", 
+                  isActive(item.path) ? "text-coral scale-110" : "text-steel"
+                )}
+              />
+            </motion.div>
             <span className="text-xs mt-1">{item.label}</span>
           </Link>
         ))}
+      </div>
+
+      {/* Bottom nav background decoration - inspired by Indian patterns */}
+      <div className="absolute -top-1 left-0 right-0 h-1 overflow-hidden">
+        <div className="flex justify-evenly">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} className="w-5 h-2 bg-coral rounded-b-full opacity-40"></div>
+          ))}
+        </div>
       </div>
     </motion.nav>
   );
