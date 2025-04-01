@@ -33,7 +33,10 @@ const App = () => {
         setIsLoggedIn(!!userData.isLoggedIn);
       } catch (e) {
         console.error("Error parsing user data", e);
+        setIsLoggedIn(false);
       }
+    } else {
+      setIsLoggedIn(false);
     }
   }, []);
 

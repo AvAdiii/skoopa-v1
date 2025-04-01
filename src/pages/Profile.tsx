@@ -1,3 +1,4 @@
+
 import { ArrowLeft, ChevronRight, LogOut, Settings, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import CustomerBottomNav from "@/components/CustomerBottomNav";
@@ -38,8 +39,9 @@ const Profile = () => {
   const handleLogout = () => {
     // Clear user data from localStorage
     localStorage.removeItem("skoopa-user");
-    // Navigate to login page
-    navigate("/login");
+    
+    // Force page reload to ensure App.tsx picks up the logout state change
+    window.location.href = "/login";
   };
 
   return (

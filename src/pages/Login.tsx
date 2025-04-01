@@ -39,15 +39,15 @@ const Login = () => {
 
     // For demo purposes, we'll just set user in localStorage and navigate to home
     localStorage.setItem("skoopa-user", JSON.stringify({
-      firstName: "Rahul",
-      lastName: "Sharma",
+      firstName: "Ravi",
+      lastName: "Kumar",
       phoneNumber: phoneNumber || "9876543210",
       email: email || "user@example.com",
       isLoggedIn: true
     }));
     
-    // Direct redirect instead of showing success message
-    navigate("/");
+    // Force page reload to ensure App.tsx picks up the login state change
+    window.location.href = "/";
   };
 
   const staggerVariants = {
