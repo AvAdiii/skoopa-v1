@@ -1,8 +1,8 @@
-
 import { ArrowLeft, ChevronRight, LogOut, Settings, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CustomerBottomNav from "@/components/CustomerBottomNav";
 import SkoopaLogo from "@/components/SkoopaLogo";
+import { toast } from "sonner";
 
 const ProfileSection = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -33,6 +33,15 @@ const ProfileItem = ({ icon, label, value, onClick }: { icon: React.ReactNode, l
 };
 
 const Profile = () => {
+  const navigate = useNavigate();
+  
+  const handleLogout = () => {
+    // Clear user data from localStorage
+    localStorage.removeItem("skoopa-user");
+    // Navigate to login page
+    navigate("/login");
+  };
+
   return (
     <div className="pb-20">
       {/* Header */}
@@ -124,7 +133,10 @@ const Profile = () => {
         </ProfileSection>
 
         {/* Logout */}
-        <button className="w-full flex items-center justify-center gap-2 py-3 mt-6 bg-white rounded-lg border border-red-300 text-red-500 font-medium hover:bg-red-50 transition-colors">
+        <button 
+          className="w-full flex items-center justify-center gap-2 py-3 mt-6 bg-white rounded-lg border border-red-300 text-red-500 font-medium hover:bg-red-50 transition-colors"
+          onClick={handleLogout}
+        >
           <LogOut size={18} />
           <span>Logout</span>
         </button>

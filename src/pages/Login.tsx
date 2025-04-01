@@ -37,7 +37,7 @@ const Login = () => {
       return;
     }
 
-    // For demo purposes, we'll just navigate to home
+    // For demo purposes, we'll just set user in localStorage and navigate to home
     localStorage.setItem("skoopa-user", JSON.stringify({
       firstName: "Rahul",
       lastName: "Sharma",
@@ -46,12 +46,8 @@ const Login = () => {
       isLoggedIn: true
     }));
     
-    toast.success("Login successful!");
-    
-    // Add a short delay to allow the toast to be seen before navigation
-    setTimeout(() => {
-      window.location.href = "/"; // Using direct location change instead of navigate
-    }, 800);
+    // Direct redirect instead of showing success message
+    navigate("/");
   };
 
   const staggerVariants = {
