@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { Search, Calendar, Bell, ChevronRight, User } from "lucide-react";
 import CustomerBottomNav from "@/components/CustomerBottomNav";
 import HomeLocationHeader from "@/components/HomeLocationHeader";
 import PromoCarousel from "@/components/PromoCarousel";
@@ -11,6 +12,9 @@ import ServiceCategory from "@/components/ServiceCategory";
 import SkoopaLogo from "@/components/SkoopaLogo";
 import UserGreeting from "@/components/UserGreeting";
 import ActiveBooking from "@/components/ActiveBooking";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 // Mock data for services
 const REGULAR_SERVICES = [
@@ -80,6 +84,7 @@ interface BookingInfo {
 const Index = () => {
   const navigate = useNavigate();
   const [activeBooking, setActiveBooking] = useState<BookingInfo | null>(null);
+  const [userName, setUserName] = useState("Rajesh");
   
   useEffect(() => {
     // Check if there's a booking in localStorage
@@ -95,64 +100,216 @@ const Index = () => {
         console.error("Error parsing bookings from localStorage", e);
       }
     }
+    
+    // Get user info
+    const user = localStorage.getItem("skoopa-user");
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        if (userData?.name) {
+          setUserName(userData.name);
+        }
+      } catch (e) {
+        console.error("Error parsing user data", e);
+      }
+    }
   }, []);
   
   const handleSearch = (query: string) => {
     console.log("Search query:", query);
     // In a real app, this would navigate to search results with the query
   };
+
+  // Get today's date info
+  const today = new Date();
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const currentDayOfWeek = today.getDay();
+  const dayNumber = today.getDate();
+  
+  const weekDays = Array.from({ length: 7 }, (_, i) => {
+    const dayIndex = (currentDayOfWeek + i) % 7;
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    return {
+      day: days[dayIndex],
+      date: date.getDate(),
+      isToday: i === 0,
+    };
+  });
   
   return (
     <div className="pb-20">
-      {/* Header with Logo */}
+      {/* Header Section */}
       <motion.div 
-        className="sticky top-0 z-40 bg-white py-3 px-4 border-b border-smoke"
-        initial={{ y: -50 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5, type: "spring" }}
+        className="px-6 py-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
       >
-        <div className="flex justify-center">
-          <SkoopaLogo />
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-xl font-bold">Hello, {userName}</h1>
+            <p className="text-muted-foreground text-sm">Today is a great day</p>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="ghost" size="icon" className="rounded-full bg-background" onClick={() => navigate('/notifications')}>
+              <Bell size={20} />
+            </Button>
+            <Button variant="ghost" size="icon" className="rounded-full bg-background" onClick={() => navigate('/profile')}>
+              <Avatar className="h-9 w-9">
+                <AvatarImage src="/placeholder.svg" alt={userName} />
+                <AvatarFallback className="bg-primary/10 text-primary">
+                  {userName.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
+          </div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mt-6 relative">
+          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-muted-foreground" />
+          </div>
+          <input
+            className="bg-muted/50 w-full rounded-2xl py-3 pl-10 pr-4 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+            placeholder="Search for services..."
+            onChange={(e) => handleSearch(e.target.value)}
+          />
         </div>
       </motion.div>
 
-      <div className="px-4 py-3">
-        {/* Location Header */}
-        <HomeLocationHeader />
-        
-        {/* Greeting */}
-        <UserGreeting className="mt-6" />
+      {/* Daily Challenge Card */}
+      <motion.div
+        className="mx-6 mb-6"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1 }}
+      >
+        <div className="app-card bg-primary/10">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h2 className="text-lg font-bold text-foreground">Daily challenge</h2>
+              <p className="text-sm text-muted-foreground">Complete today's cleaning</p>
+            </div>
+            <div className="flex -space-x-2">
+              {[1, 2, 3].map((i) => (
+                <Avatar key={i} className="border-2 border-white h-6 w-6">
+                  <AvatarFallback className="text-xs bg-accent/80">{i}</AvatarFallback>
+                </Avatar>
+              ))}
+            </div>
+          </div>
 
-        {/* Search */}
-        <SearchInput className="mt-4" onSearch={handleSearch} />
+          {/* Calendar Strip */}
+          <div className="flex justify-between mb-4">
+            {weekDays.map((day, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <span className="text-xs text-muted-foreground">{day.day}</span>
+                <div className={cn(
+                  "day-indicator mt-1",
+                  day.isToday ? "day-active" : "day-inactive"
+                )}>
+                  {day.date}
+                </div>
+              </div>
+            ))}
+          </div>
 
-        {/* Main Content Section */}
-        <motion.div 
-          className="mt-6 pt-6 px-4 -mx-4 rounded-t-3xl bg-gradient-to-b from-azure/20 to-white"
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-        >
-          {/* Promo Carousel */}
-          <PromoCarousel />
+          <h3 className="font-semibold mb-3">Your plan</h3>
 
-          {/* Quick Actions */}
-          <QuickActions />
+          {/* Plan Cards */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="stat-card gradient-accent text-left">
+              <div className="flex items-center gap-1 opacity-80">
+                <Calendar size={14} />
+                <span className="text-xs">2h 15m</span>
+              </div>
+              <h4 className="font-bold text-base mt-1">Regular Clean</h4>
+              <p className="text-xs mt-1 opacity-80">10:00-12:15</p>
+              <div className="flex gap-1 items-center mt-2">
+                <Avatar className="h-5 w-5">
+                  <AvatarFallback className="text-xs">M</AvatarFallback>
+                </Avatar>
+                <span className="text-xs">with Meera</span>
+              </div>
+            </div>
+            
+            <div className="stat-card bg-secondary/20 text-left">
+              <div className="flex items-center gap-1 opacity-80">
+                <Calendar size={14} />
+                <span className="text-xs">1h 30m</span>
+              </div>
+              <h4 className="font-bold text-base mt-1">Kitchen Clean</h4>
+              <p className="text-xs mt-1 opacity-80">14:00-15:30</p>
+              <div className="flex gap-1 items-center mt-2">
+                <Avatar className="h-5 w-5">
+                  <AvatarFallback className="text-xs">S</AvatarFallback>
+                </Avatar>
+                <span className="text-xs">with Sunita</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
 
-          {/* Service Categories */}
-          <ServiceCategory
-            title="Regular Services"
-            services={REGULAR_SERVICES}
-          />
-          
-          <ServiceCategory
-            title="Premium Services"
-            services={PREMIUM_SERVICES}
-          />
-        </motion.div>
+      {/* Services Section */}
+      <motion.div 
+        className="px-6"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-bold">Popular Services</h2>
+          <Button variant="ghost" size="sm" className="text-primary flex items-center gap-1">
+            <span>View all</span>
+            <ChevronRight size={16} />
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4">
+          {/* Service Cards */}
+          {[...REGULAR_SERVICES, ...PREMIUM_SERVICES].map((service, index) => (
+            <motion.div 
+              key={index}
+              className="app-card animated-card flex"
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigate(`/service/${service.title.toLowerCase().replace(' ', '-')}`)}
+            >
+              <div className={`mr-4 p-3 rounded-2xl ${index % 2 === 0 ? 'bg-primary/10 text-primary' : 'bg-accent/20 text-accent-foreground'}`}>
+                {service.icon}
+              </div>
+              <div className="flex-1">
+                <div className="flex justify-between items-start">
+                  <h3 className="font-semibold">{service.title}</h3>
+                  <span className="font-bold">₹{service.price}</span>
+                </div>
+                <p className="text-muted-foreground text-xs line-clamp-1 mt-1">
+                  {service.description}
+                </p>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-xs bg-muted/50 px-2 py-1 rounded-full">
+                    {service.duration}
+                  </span>
+                  {service.popular && (
+                    <span className="text-xs bg-accent/20 text-accent-foreground px-2 py-1 rounded-full font-medium">
+                      Popular
+                    </span>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Promos Section - Using existing component */}
+      <div className="mt-8 px-6">
+        <h2 className="text-lg font-bold mb-4">Special Offers</h2>
+        <PromoCarousel />
       </div>
 
-      {/* Active Booking */}
+      {/* Active Booking Overlay */}
       <AnimatePresence>
         {activeBooking && (
           <ActiveBooking 

@@ -1,10 +1,11 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 252 60% 96%;
     --foreground: 0 0% 16%;
 
     --card: 0 0% 100%;
@@ -13,78 +14,75 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 16%;
 
-    /* Coral #FF6B6B - Brand color */
-    --primary: 0 59% 71%;
+    /* Updated color scheme */
+    --primary: 260 65% 60%;
     --primary-foreground: 0 0% 100%;
 
-    /* Sapphire #0A2342 - Headings, deep accents */
-    --secondary: 217 75% 15%;
+    --secondary: 180 65% 60%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Smoke #E8E8E8 - Dividers */
-    --muted: 0 0% 91%;
-    --muted-foreground: 225 2% 46%;
+    --muted: 260 10% 90%;
+    --muted-foreground: 260 10% 40%;
 
-    /* Azure #D3E7FF - Subtle highlights */
-    --accent: 214 100% 91%;
-    --accent-foreground: 217 75% 15%;
+    --accent: 30 90% 65%;
+    --accent-foreground: 0 0% 16%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 91%;
-    --input: 0 0% 91%;
-    --ring: 0 59% 71%;
+    --border: 260 30% 90%;
+    --input: 260 30% 90%;
+    --ring: 260 65% 60%;
 
-    --radius: 0.75rem;
+    --radius: 1.5rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-background: 260 65% 60%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 260 80% 40%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 260 70% 70%;
+    --sidebar-accent-foreground: 0 0% 16%;
+    --sidebar-border: 260 70% 50%;
+    --sidebar-ring: 260 80% 40%;
   }
 
   .dark {
-    --background: 217 75% 15%;
-    --foreground: 0 0% 100%;
+    --background: 260 25% 12%;
+    --foreground: 0 0% 98%;
 
-    --card: 217 75% 15%;
-    --card-foreground: 0 0% 100%;
+    --card: 260 25% 16%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 217 75% 15%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 260 25% 16%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 0 59% 71%;
+    --primary: 260 65% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 217 75% 15%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 180 65% 40%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 217 25% 25%;
-    --muted-foreground: 214 5% 75%;
+    --muted: 260 25% 25%;
+    --muted-foreground: 260 10% 70%;
 
-    --accent: 214 50% 40%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 30 90% 55%;
+    --accent-foreground: 0 0% 16%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 217 25% 25%;
-    --input: 217 25% 25%;
-    --ring: 0 59% 71%;
+    --border: 260 25% 25%;
+    --input: 260 25% 25%;
+    --ring: 260 65% 60%;
 
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-background: 260 25% 20%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 260 65% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 260 25% 30%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 260 25% 30%;
+    --sidebar-ring: 260 65% 60%;
   }
 }
 
@@ -99,62 +97,66 @@
   }
 }
 
-/* Indian-inspired patterns and decorative elements */
-.indian-border {
-  @apply border-2 border-gold relative;
+/* Updated design system */
+.app-card {
+  @apply bg-white rounded-3xl shadow-md p-5 transition-all duration-300 hover:shadow-lg;
 }
 
-.indian-border::before,
-.indian-border::after {
-  content: '';
-  @apply absolute w-4 h-4 bg-gold;
+.gradient-primary {
+  @apply bg-gradient-to-br from-primary to-purple-400;
 }
 
-.indian-border::before {
-  @apply -left-1 -top-1;
-  clip-path: polygon(0 0, 100% 0, 0 100%);
+.gradient-secondary {
+  @apply bg-gradient-to-br from-secondary to-cyan-300;
 }
 
-.indian-border::after {
-  @apply -right-1 -bottom-1;
-  clip-path: polygon(100% 100%, 0 100%, 100% 0);
+.gradient-accent {
+  @apply bg-gradient-to-br from-accent to-amber-300;
 }
 
-.shimmer {
-  @apply relative overflow-hidden before:absolute before:inset-0 before:animate-shimmer;
-  background: linear-gradient(90deg, #f0f0f0 0px, #f8f8f8 40px, #f0f0f0 80px);
-  background-size: 500px 100%;
+.animated-card {
+  @apply transition-all duration-300 hover:translate-y-[-5px] hover:shadow-lg;
+}
+
+.stat-card {
+  @apply rounded-2xl p-4 text-center shadow-sm;
+}
+
+.progress-ring {
+  @apply rounded-full p-1;
+  background: conic-gradient(theme('colors.primary.DEFAULT') var(--progress), theme('colors.muted.DEFAULT') 0);
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-smoke rounded-full;
+  @apply bg-muted rounded-full;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-coral rounded-full;
+  @apply bg-primary rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-sapphire;
+  @apply bg-primary/80;
 }
 
 /* Custom Streak Slider for Maid Dashboard */
 .streak-slider [data-orientation="horizontal"] {
   height: 8px;
+  @apply bg-muted rounded-full;
 }
 
 .streak-slider .bg-primary {
-  @apply bg-gradient-to-r from-coral to-amber-400;
+  @apply bg-gradient-to-r from-primary to-accent;
 }
 
 .streak-slider [role="slider"] {
-  @apply h-6 w-6 -top-1 bg-white border-2 border-amber-500;
+  @apply h-6 w-6 -top-1 bg-white border-2 border-accent;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
@@ -173,4 +175,38 @@
 
 .float-animation {
   animation: float 3s ease-in-out infinite;
+}
+
+/* App-specific components */
+.profile-stat {
+  @apply flex flex-col items-center rounded-xl p-3;
+}
+
+.day-indicator {
+  @apply rounded-full w-10 h-10 flex items-center justify-center text-xs;
+}
+
+.day-active {
+  @apply bg-primary text-white;
+}
+
+.day-inactive {
+  @apply bg-muted text-muted-foreground;
+}
+
+/* Bottom navigation styling */
+.bottom-nav-item {
+  @apply flex flex-col items-center py-2 px-3 relative;
+}
+
+.bottom-nav-icon {
+  @apply mb-1 p-2 rounded-full;
+}
+
+.bottom-nav-active {
+  @apply text-primary;
+}
+
+.bottom-nav-active .bottom-nav-icon {
+  @apply bg-primary/10;
 }
