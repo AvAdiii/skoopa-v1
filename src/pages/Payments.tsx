@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Calendar, CreditCard, Plus, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import CustomerBottomNav from "@/components/CustomerBottomNav";
+import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 interface PaymentMethod {
   id: string;
@@ -23,7 +25,7 @@ interface PaymentHistoryItem {
 const Payments = () => {
   const navigate = useNavigate();
   
-  const paymentMethods: PaymentMethod[] = [
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
     {
       id: "1",
       type: "card",
@@ -38,9 +40,9 @@ const Payments = () => {
       details: "user@oksbi",
       isDefault: false
     }
-  ];
+  ]);
   
-  const paymentHistory: PaymentHistoryItem[] = [
+  const [paymentHistory, setPaymentHistory] = useState<PaymentHistoryItem[]>([
     {
       id: "1",
       amount: "₹799",
@@ -62,13 +64,43 @@ const Payments = () => {
       description: "Monthly Subscription - March",
       status: "completed"
     }
-  ];
+  ]);
   
-  const upcomingPayment = {
+  const [upcomingPayment, setUpcomingPayment] = useState({
     amount: "₹799",
     dueDate: "May 1, 2024",
     daysLeft: 3,
     description: "Monthly Subscription - May"
+  });
+  
+  const handlePayNow = () => {
+    toast({
+      title: "Payment Successful",
+      description: `You've successfully paid ${upcomingPayment.amount}`,
+    });
+    
+    // Add to payment history
+    const newPayment: PaymentHistoryItem = {
+      id: Date.now().toString(),
+      amount: upcomingPayment.amount,
+      date: "Just now",
+      description: upcomingPayment.description,
+      status: "completed"
+    };
+    
+    setPaymentHistory([newPayment, ...paymentHistory]);
+    
+    // Remove upcoming payment
+    setUpcomingPayment({
+      amount: "₹799",
+      dueDate: "June 1, 2024",
+      daysLeft: 30,
+      description: "Monthly Subscription - June"
+    });
+  };
+  
+  const goToAddPaymentMethod = () => {
+    navigate('/add-payment-method');
   };
   
   const getCardIcon = (type: string) => {
@@ -137,7 +169,10 @@ const Payments = () => {
               <Calendar size={14} className="mr-1" />
               Due on {upcomingPayment.dueDate}
             </div>
-            <button className="w-full mt-3 py-2.5 bg-coral text-white rounded-lg font-medium">
+            <button 
+              className="w-full mt-3 py-2.5 bg-coral text-white rounded-lg font-medium"
+              onClick={handlePayNow}
+            >
               Pay Now
             </button>
           </motion.div>
@@ -147,7 +182,10 @@ const Payments = () => {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-bold text-sapphire">Payment Methods</h2>
-            <button className="flex items-center text-sm text-coral font-medium">
+            <button 
+              className="flex items-center text-sm text-coral font-medium"
+              onClick={goToAddPaymentMethod}
+            >
               <Plus size={16} className="mr-1" />
               Add New
             </button>

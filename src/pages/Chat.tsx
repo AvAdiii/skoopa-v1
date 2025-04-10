@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ArrowLeft, MoreVertical, Paperclip, Send } from "lucide-react";
 import { Link } from "react-router-dom";
 import CustomerBottomNav from "@/components/CustomerBottomNav";
@@ -126,10 +126,11 @@ const ChatMessage = ({ message }: { message: ChatMessage }) => {
   );
 };
 
-const ChatThread = ({ thread }: { thread: ChatThread }) => {
+const ChatThread = ({ thread, onClick }: { thread: ChatThread; onClick: () => void }) => {
   return (
     <button
       className="flex items-center w-full p-3 border-b border-smoke last:border-b-0 hover:bg-smoke/20 transition-colors"
+      onClick={onClick}
     >
       <div className="relative">
         <img
@@ -155,14 +156,96 @@ const ChatThread = ({ thread }: { thread: ChatThread }) => {
 };
 
 const Chat = () => {
+  const [chats, setChats] = useState<ChatThread[]>(CHATS);
   const [activeChat, setActiveChat] = useState<ChatThread | null>(null);
   const [newMessage, setNewMessage] = useState("");
+  const [showOptions, setShowOptions] = useState(false);
+  const messageContainerRef = useRef<HTMLDivElement>(null);
 
   const handleSend = () => {
-    if (newMessage.trim() === "") return;
-    console.log("Sending message:", newMessage);
+    if (newMessage.trim() === "" || !activeChat) return;
+    
+    // Create new message
+    const now = new Date();
+    const timeString = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    const newMsg: ChatMessage = {
+      id: `m${Date.now()}`,
+      text: newMessage,
+      sender: "user",
+      time: timeString,
+      status: "sent",
+    };
+    
+    // Update active chat with new message
+    const updatedChat = {
+      ...activeChat,
+      messages: [...activeChat.messages, newMsg],
+      lastMessage: newMessage,
+      time: "Just now",
+    };
+    
+    // Update chats list
+    setChats(prevChats => 
+      prevChats.map(chat => 
+        chat.id === activeChat.id ? updatedChat : chat
+      )
+    );
+    
+    // Update active chat
+    setActiveChat(updatedChat);
     setNewMessage("");
+    
+    // Simulate received message
+    setTimeout(() => {
+      if (updatedChat.maidName === "Geeta Singh") {
+        const replyMsg: ChatMessage = {
+          id: `m${Date.now() + 1}`,
+          text: "Yes, I'll be bringing all the necessary cleaning supplies with me. See you tomorrow at 9am!",
+          sender: "maid",
+          time: timeString,
+        };
+        
+        const chatWithReply = {
+          ...updatedChat,
+          messages: [...updatedChat.messages, replyMsg],
+          lastMessage: replyMsg.text,
+          time: "Just now",
+        };
+        
+        setChats(prevChats => 
+          prevChats.map(chat => 
+            chat.id === activeChat.id ? chatWithReply : chat
+          )
+        );
+        
+        setActiveChat(chatWithReply);
+      }
+    }, 2000);
   };
+
+  const handleChatSelection = (chat: ChatThread) => {
+    // Mark messages as read
+    const updatedChat = {
+      ...chat,
+      unread: 0,
+    };
+    
+    setChats(prevChats => 
+      prevChats.map(c => 
+        c.id === chat.id ? updatedChat : c
+      )
+    );
+    
+    setActiveChat(updatedChat);
+  };
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (messageContainerRef.current && activeChat) {
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+    }
+  }, [activeChat?.messages]);
 
   return (
     <div className="pb-20">
@@ -188,9 +271,46 @@ const Chat = () => {
                   <span className="text-xs text-green-600">Online</span>
                 </div>
               </div>
-              <button className="ml-auto text-sapphire">
-                <MoreVertical size={20} />
-              </button>
+              <div className="ml-auto relative">
+                <button 
+                  className="text-sapphire p-2 rounded-full hover:bg-smoke/30 transition-colors"
+                  onClick={() => setShowOptions(!showOptions)}
+                >
+                  <MoreVertical size={20} />
+                </button>
+                
+                {showOptions && (
+                  <div className="absolute right-0 top-10 w-40 bg-white border border-smoke rounded-lg shadow-lg overflow-hidden z-50">
+                    <button 
+                      className="w-full text-left px-4 py-2 hover:bg-smoke/30 transition-colors"
+                      onClick={() => {
+                        setShowOptions(false);
+                        // Implement call functionality in a real app
+                      }}
+                    >
+                      Call
+                    </button>
+                    <button 
+                      className="w-full text-left px-4 py-2 hover:bg-smoke/30 transition-colors"
+                      onClick={() => {
+                        setShowOptions(false);
+                        // Implement contact info functionality in a real app
+                      }}
+                    >
+                      View Contact
+                    </button>
+                    <button 
+                      className="w-full text-left px-4 py-2 hover:bg-smoke/30 transition-colors text-red-500"
+                      onClick={() => {
+                        setShowOptions(false);
+                        setActiveChat(null);
+                      }}
+                    >
+                      Close Chat
+                    </button>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <>
@@ -206,7 +326,10 @@ const Chat = () => {
       {activeChat ? (
         // Chat conversation
         <div className="flex flex-col h-[calc(100vh-170px)]">
-          <div className="flex-1 overflow-y-auto p-4">
+          <div 
+            className="flex-1 overflow-y-auto p-4"
+            ref={messageContainerRef}
+          >
             {activeChat.messages.map((message) => (
               <ChatMessage key={message.id} message={message} />
             ))}
@@ -221,6 +344,7 @@ const Chat = () => {
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 placeholder="Type a message..."
                 className="flex-1 border-none focus:ring-0 focus:outline-none"
               />
@@ -240,9 +364,12 @@ const Chat = () => {
       ) : (
         // Chat threads list
         <div className="divide-y divide-smoke">
-          {CHATS.map((chat) => (
-            <div key={chat.id} onClick={() => setActiveChat(chat)}>
-              <ChatThread thread={chat} />
+          {chats.map((chat) => (
+            <div key={chat.id}>
+              <ChatThread 
+                thread={chat} 
+                onClick={() => handleChatSelection(chat)} 
+              />
             </div>
           ))}
         </div>

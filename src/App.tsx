@@ -17,6 +17,24 @@ import Payments from "./pages/Payments";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
+import EditLocation from "./pages/EditLocation";
+import AddPaymentMethod from "./pages/AddPaymentMethod";
+
+// New placeholder pages for Profile section actions
+import EditProfile from "./pages/EditProfile";
+import Settings from "./pages/Settings";
+import MyAddresses from "./pages/MyAddresses";
+import FavoriteMaids from "./pages/FavoriteMaids";
+import HelpSupport from "./pages/HelpSupport";
+import AboutSkoopa from "./pages/AboutSkoopa";
+
+// New placeholder pages for Bookings actions
+import RescheduleBooking from "./pages/RescheduleBooking";
+import TrackBooking from "./pages/TrackBooking";
+import ReviewBooking from "./pages/ReviewBooking";
+
+// New placeholder pages for premium maids and other pages
+import PremiumMaids from "./pages/PremiumMaids";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +91,20 @@ const App = () => {
             <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
             <Route path="/notifications" element={isLoggedIn ? <Notifications /> : <Navigate to="/login" />} />
             <Route path="/service/:serviceType" element={isLoggedIn ? <ServiceBooking /> : <Navigate to="/login" />} />
+            
+            {/* New routes */}
+            <Route path="/edit-location" element={isLoggedIn ? <EditLocation /> : <Navigate to="/login" />} />
+            <Route path="/add-payment-method" element={isLoggedIn ? <AddPaymentMethod /> : <Navigate to="/login" />} />
+            <Route path="/edit-profile" element={isLoggedIn ? <EditProfile /> : <Navigate to="/login" />} />
+            <Route path="/settings" element={isLoggedIn ? <Settings /> : <Navigate to="/login" />} />
+            <Route path="/my-addresses" element={isLoggedIn ? <MyAddresses /> : <Navigate to="/login" />} />
+            <Route path="/favorite-maids" element={isLoggedIn ? <FavoriteMaids /> : <Navigate to="/login" />} />
+            <Route path="/help-support" element={isLoggedIn ? <HelpSupport /> : <Navigate to="/login" />} />
+            <Route path="/about" element={isLoggedIn ? <AboutSkoopa /> : <Navigate to="/login" />} />
+            <Route path="/reschedule-booking/:id" element={isLoggedIn ? <RescheduleBooking /> : <Navigate to="/login" />} />
+            <Route path="/track-booking/:id" element={isLoggedIn ? <TrackBooking /> : <Navigate to="/login" />} />
+            <Route path="/review-booking/:id" element={isLoggedIn ? <ReviewBooking /> : <Navigate to="/login" />} />
+            <Route path="/premium-maids" element={isLoggedIn ? <PremiumMaids /> : <Navigate to="/login" />} />
             
             {/* Maid interface routes */}
             <Route path="/maid" element={<MaidDashboard />} />

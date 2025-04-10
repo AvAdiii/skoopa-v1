@@ -1,6 +1,6 @@
 
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
@@ -8,22 +8,50 @@ interface SearchInputProps {
   placeholder?: string;
   className?: string;
   onSearch?: (query: string) => void;
+  value?: string;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const SearchInput = ({ 
   placeholder = "Search for services...", 
   className,
-  onSearch 
+  onSearch,
+  value,
+  onChange
 }: SearchInputProps) => {
   const [query, setQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   
+  const controlledValue = value !== undefined ? value : query;
+  
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (onChange) {
+      onChange(e);
+    } else {
+      setQuery(e.target.value);
+    }
+  };
+  
   const handleSearch = () => {
-    if (onSearch) onSearch(query);
+    if (onSearch) onSearch(controlledValue);
   };
   
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") handleSearch();
+  };
+  
+  const handleClear = () => {
+    if (onChange) {
+      // Create a synthetic event
+      const event = {
+        target: {
+          value: ""
+        }
+      } as ChangeEvent<HTMLInputElement>;
+      onChange(event);
+    } else {
+      setQuery("");
+    }
   };
   
   return (
@@ -39,8 +67,8 @@ const SearchInput = ({
       
       <input
         type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        value={controlledValue}
+        onChange={handleChange}
         onKeyDown={handleKeyDown}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
@@ -52,9 +80,9 @@ const SearchInput = ({
         <Search className="text-steel w-5 h-5" />
       </div>
       
-      {query && (
+      {controlledValue && (
         <button
-          onClick={() => setQuery("")}
+          onClick={handleClear}
           className="absolute right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full bg-smoke/50 flex items-center justify-center text-steel hover:bg-smoke transition-colors"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -17,12 +17,7 @@ const CustomerBottomNav = () => {
   ];
 
   return (
-    <motion.nav 
-      className="fixed bottom-0 left-0 right-0 bg-white border-t border-smoke z-50 shadow-lg"
-      initial={{ y: 100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.3, type: "spring", stiffness: 260, damping: 20 }}
-    >
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-smoke z-50 shadow-lg">
       <div className="flex justify-between items-center px-2">
         {navItems.map((item) => (
           <Link
@@ -68,7 +63,7 @@ const CustomerBottomNav = () => {
           ))}
         </div>
       </div>
-    </motion.nav>
+    </nav>
   );
 };
 

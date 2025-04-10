@@ -1,8 +1,9 @@
 
 import { ArrowLeft, ChevronRight, LogOut, Settings, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CustomerBottomNav from "@/components/CustomerBottomNav";
 import SkoopaLogo from "@/components/SkoopaLogo";
+import { toast } from "@/hooks/use-toast";
 
 const ProfileSection = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -33,9 +34,16 @@ const ProfileItem = ({ icon, label, value, onClick }: { icon: React.ReactNode, l
 };
 
 const Profile = () => {
+  const navigate = useNavigate();
+  
   const handleLogout = () => {
     // Clear user data from localStorage
     localStorage.removeItem("skoopa-user");
+    
+    toast({
+      title: "Logged out",
+      description: "You have been logged out successfully",
+    });
     
     // Redirect to login page
     window.location.href = "/login";
@@ -55,6 +63,14 @@ const Profile = () => {
   };
 
   const user = getUserData();
+  
+  const handleEditProfile = () => {
+    navigate("/edit-profile");
+  };
+  
+  const handleSettings = () => {
+    navigate("/settings");
+  };
 
   return (
     <div className="pb-20">
@@ -67,9 +83,12 @@ const Profile = () => {
             </Link>
             <h1 className="text-lg font-bold text-sapphire">Profile</h1>
           </div>
-          <Link to="/" className="text-coral">
+          <button 
+            onClick={handleSettings}
+            className="text-coral"
+          >
             <Settings size={22} />
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -81,7 +100,10 @@ const Profile = () => {
           </div>
           <h2 className="text-xl font-bold text-charcoal">{`${user.firstName} ${user.lastName}`}</h2>
           <p className="text-steel">{user.phoneNumber}</p>
-          <button className="mt-3 py-1.5 px-4 rounded-full border border-coral text-coral text-sm font-medium hover:bg-coral/5 transition-colors">
+          <button 
+            className="mt-3 py-1.5 px-4 rounded-full border border-coral text-coral text-sm font-medium hover:bg-coral/5 transition-colors"
+            onClick={handleEditProfile}
+          >
             Edit Profile
           </button>
         </div>
@@ -98,7 +120,7 @@ const Profile = () => {
             </svg>}
             label="My Addresses"
             value="2 saved addresses"
-            onClick={() => console.log("Addresses")}
+            onClick={() => navigate("/my-addresses")}
           />
           <ProfileItem 
             icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -106,7 +128,7 @@ const Profile = () => {
             </svg>}
             label="Favorite Maids"
             value="3 favorites"
-            onClick={() => console.log("Favorites")}
+            onClick={() => navigate("/favorite-maids")}
           />
           <ProfileItem 
             icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -120,7 +142,7 @@ const Profile = () => {
             </svg>}
             label="Payment Methods"
             value="UPI, Credit Card"
-            onClick={() => console.log("Payment")}
+            onClick={() => navigate("/add-payment-method")}
           />
         </ProfileSection>
 
@@ -133,7 +155,7 @@ const Profile = () => {
               <path d="M12 8h.01"/>
             </svg>}
             label="Help & Support"
-            onClick={() => console.log("Help")}
+            onClick={() => navigate("/help-support")}
           />
           <ProfileItem 
             icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -142,7 +164,7 @@ const Profile = () => {
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
             </svg>}
             label="About Skoopa"
-            onClick={() => console.log("About")}
+            onClick={() => navigate("/about")}
           />
         </ProfileSection>
 

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 type PromoSlide = {
   id: number;
@@ -9,6 +10,8 @@ type PromoSlide = {
   description: string;
   bgColor: string;
   image?: string;
+  link: string;
+  actionText: string;
 };
 
 const promos: PromoSlide[] = [
@@ -17,22 +20,29 @@ const promos: PromoSlide[] = [
     title: "Diwali Special",
     description: "Get 20% off on deep cleaning services",
     bgColor: "bg-gradient-to-r from-coral to-gold",
+    link: "/service/deep-cleaning",
+    actionText: "Book Now"
   },
   {
     id: 2,
     title: "Premium Maids",
     description: "Highly trained professionals at your service",
     bgColor: "bg-gradient-to-r from-sapphire to-azure",
+    link: "/premium-maids",
+    actionText: "View Maids"
   },
   {
     id: 3,
     title: "First Booking",
     description: "Use code FIRST50 for ₹50 off",
     bgColor: "bg-gradient-to-r from-gold to-coral",
+    link: "/service/regular-cleaning",
+    actionText: "Claim Now"
   },
 ];
 
 const PromoCarousel = () => {
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const nextSlide = () => {
@@ -41,6 +51,11 @@ const PromoCarousel = () => {
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev === 0 ? promos.length - 1 : prev - 1));
+  };
+
+  const handleAction = (link: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(link);
   };
 
   useEffect(() => {
@@ -60,9 +75,10 @@ const PromoCarousel = () => {
           <div
             key={promo.id}
             className={cn(
-              "flex-shrink-0 w-full h-full relative flex flex-col justify-center p-6",
+              "flex-shrink-0 w-full h-full relative flex flex-col justify-center p-6 cursor-pointer",
               promo.bgColor
             )}
+            onClick={() => navigate(promo.link)}
           >
             <div className="absolute top-2 right-2 w-16 h-16 rounded-full border-2 border-white/30 flex items-center justify-center overflow-hidden">
               <div className="w-24 h-24 bg-white/10 backdrop-blur-sm"></div>
@@ -71,8 +87,11 @@ const PromoCarousel = () => {
             <p className="text-white/90 text-sm max-w-[80%]">
               {promo.description}
             </p>
-            <button className="mt-4 bg-white text-charcoal py-1.5 px-3 rounded-full text-sm font-medium self-start hover:bg-opacity-90 transition-colors">
-              Claim Now
+            <button 
+              className="mt-4 bg-white text-charcoal py-1.5 px-3 rounded-full text-sm font-medium self-start hover:bg-opacity-90 transition-colors"
+              onClick={(e) => handleAction(promo.link, e)}
+            >
+              {promo.actionText}
             </button>
           </div>
         ))}

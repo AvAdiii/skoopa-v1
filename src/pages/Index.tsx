@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { Bell } from "lucide-react";
 import CustomerBottomNav from "@/components/CustomerBottomNav";
 import HomeLocationHeader from "@/components/HomeLocationHeader";
 import PromoCarousel from "@/components/PromoCarousel";
@@ -11,6 +12,8 @@ import ServiceCategory from "@/components/ServiceCategory";
 import SkoopaLogo from "@/components/SkoopaLogo";
 import UserGreeting from "@/components/UserGreeting";
 import ActiveBooking from "@/components/ActiveBooking";
+import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 // Mock data for services
 const REGULAR_SERVICES = [
@@ -27,6 +30,7 @@ const REGULAR_SERVICES = [
     price: "249",
     duration: "1 hour",
     popular: true,
+    id: "regular-cleaning"
   },
   {
     icon: (
@@ -42,6 +46,7 @@ const REGULAR_SERVICES = [
     price: "349",
     duration: "1.5 hours",
     popular: false,
+    id: "kitchen-cleaning"
   },
 ];
 
@@ -49,10 +54,8 @@ const PREMIUM_SERVICES = [
   {
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M2 20h20"/>
-        <path d="M12 16v4"/>
-        <path d="M4 20v-8a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8"/>
-        <path d="M12 7V4"/>
+        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+        <line x1="7" y1="7" x2="7.01" y2="7"></line>
       </svg>
     ),
     title: "Deep Cleaning",
@@ -60,6 +63,7 @@ const PREMIUM_SERVICES = [
     price: "899",
     duration: "4 hours",
     popular: true,
+    id: "deep-cleaning"
   }
 ];
 
@@ -80,6 +84,9 @@ interface BookingInfo {
 const Index = () => {
   const navigate = useNavigate();
   const [activeBooking, setActiveBooking] = useState<BookingInfo | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   
   useEffect(() => {
     // Check if there's a booking in localStorage
@@ -98,8 +105,30 @@ const Index = () => {
   }, []);
   
   const handleSearch = (query: string) => {
-    console.log("Search query:", query);
-    // In a real app, this would navigate to search results with the query
+    setSearchQuery(query);
+    setIsSearching(true);
+    
+    // Simulate search results
+    const allServices = [...REGULAR_SERVICES, ...PREMIUM_SERVICES];
+    const results = allServices.filter(service => 
+      service.title.toLowerCase().includes(query.toLowerCase()) ||
+      service.description.toLowerCase().includes(query.toLowerCase())
+    );
+    
+    setSearchResults(results);
+  };
+
+  const handleServiceClick = (serviceId: string) => {
+    navigate(`/service/${serviceId}`);
+  };
+  
+  const goToNotifications = () => {
+    navigate('/notifications');
+  };
+
+  const handleClearSearch = () => {
+    setIsSearching(false);
+    setSearchQuery("");
   };
   
   return (
@@ -107,49 +136,182 @@ const Index = () => {
       {/* Header with Logo */}
       <motion.div 
         className="sticky top-0 z-40 bg-white py-3 px-4 border-b border-smoke"
-        initial={{ y: -50 }}
+        initial={{ y: 0 }}
         animate={{ y: 0 }}
-        transition={{ duration: 0.5, type: "spring" }}
       >
-        <div className="flex justify-center">
+        <div className="flex justify-between items-center">
           <SkoopaLogo />
+          <button 
+            onClick={goToNotifications}
+            className="relative p-2 rounded-full hover:bg-smoke/30 transition-colors"
+          >
+            <Bell size={22} className="text-charcoal" />
+            <span className="absolute top-0 right-0 w-2 h-2 bg-coral rounded-full"></span>
+          </button>
         </div>
       </motion.div>
 
       <div className="px-4 py-3">
-        {/* Location Header */}
-        <HomeLocationHeader />
+        {/* Location Header - Now clickable */}
+        <div onClick={() => navigate('/edit-location')}>
+          <HomeLocationHeader />
+        </div>
         
         {/* Greeting */}
         <UserGreeting className="mt-6" />
 
         {/* Search */}
-        <SearchInput className="mt-4" onSearch={handleSearch} />
+        <SearchInput 
+          className="mt-4" 
+          onSearch={handleSearch} 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
 
-        {/* Main Content Section */}
-        <motion.div 
-          className="mt-6 pt-6 px-4 -mx-4 rounded-t-3xl bg-gradient-to-b from-azure/20 to-white"
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-        >
-          {/* Promo Carousel */}
-          <PromoCarousel />
+        {/* Search Results */}
+        {isSearching && (
+          <div className="mt-4">
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-lg font-bold text-sapphire">
+                Search Results
+              </h2>
+              <button 
+                onClick={handleClearSearch}
+                className="text-sm text-coral hover:underline"
+              >
+                Clear
+              </button>
+            </div>
+            
+            {searchResults.length > 0 ? (
+              <div className="grid grid-cols-1 gap-3">
+                {searchResults.map((service, index) => (
+                  <div 
+                    key={index} 
+                    className="p-4 bg-white rounded-xl border border-smoke shadow-sm cursor-pointer hover:border-coral transition-colors"
+                    onClick={() => handleServiceClick(service.id)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-10 h-10 bg-azure rounded-full flex items-center justify-center text-sapphire">
+                        {service.icon}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-charcoal">{service.title}</h3>
+                        <p className="text-sm text-steel line-clamp-2 mt-1">{service.description}</p>
+                        <div className="flex justify-between items-center mt-2">
+                          <span className="font-bold text-coral">₹{service.price}</span>
+                          <div className="flex items-center text-xs text-steel">
+                            <span>{service.duration}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-6 bg-white rounded-xl border border-smoke">
+                <p className="text-steel">No results found for "{searchQuery}"</p>
+              </div>
+            )}
+          </div>
+        )}
 
-          {/* Quick Actions */}
-          <QuickActions />
+        {/* Main Content Section - Only shown when not searching */}
+        {!isSearching && (
+          <motion.div 
+            className="mt-6 pt-6 px-4 -mx-4 rounded-t-3xl bg-gradient-to-b from-azure/20 to-white"
+            initial={{ y: 0, opacity: 1 }}
+            animate={{ y: 0, opacity: 1 }}
+          >
+            {/* Promo Carousel */}
+            <PromoCarousel />
 
-          {/* Service Categories */}
-          <ServiceCategory
-            title="Regular Services"
-            services={REGULAR_SERVICES}
-          />
-          
-          <ServiceCategory
-            title="Premium Services"
-            services={PREMIUM_SERVICES}
-          />
-        </motion.div>
+            {/* Quick Actions */}
+            <QuickActions />
+
+            {/* Service Categories */}
+            <div className="mb-6">
+              <h2 className="text-lg font-bold text-sapphire mb-3 flex items-center">
+                <span>Regular Services</span>
+                <div className="flex-1 h-px bg-smoke ml-3"></div>
+              </h2>
+              <div className="grid grid-cols-1 gap-3">
+                {REGULAR_SERVICES.map((service, index) => (
+                  <div 
+                    key={index}
+                    className={cn(
+                      "relative p-4 bg-white rounded-xl border border-smoke shadow-sm cursor-pointer hover:border-coral transition-colors",
+                      service.popular && "border-l-4 border-l-gold"
+                    )}
+                    onClick={() => handleServiceClick(service.id)}
+                  >
+                    {service.popular && (
+                      <span className="absolute -top-2 -right-1 bg-gold text-sapphire text-xs font-bold px-2 py-0.5 rounded-full">
+                        Popular
+                      </span>
+                    )}
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-10 h-10 bg-azure rounded-full flex items-center justify-center text-sapphire">
+                        {service.icon}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-charcoal">{service.title}</h3>
+                        <p className="text-sm text-steel line-clamp-2 mt-1">{service.description}</p>
+                        <div className="flex justify-between items-center mt-2">
+                          <span className="font-bold text-coral">₹{service.price}</span>
+                          <div className="flex items-center text-xs text-steel">
+                            <span>{service.duration}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <h2 className="text-lg font-bold text-sapphire mb-3 flex items-center">
+                <span>Premium Services</span>
+                <div className="flex-1 h-px bg-smoke ml-3"></div>
+              </h2>
+              <div className="grid grid-cols-1 gap-3">
+                {PREMIUM_SERVICES.map((service, index) => (
+                  <div 
+                    key={index}
+                    className={cn(
+                      "relative p-4 bg-white rounded-xl border border-smoke shadow-sm cursor-pointer hover:border-coral transition-colors",
+                      service.popular && "border-l-4 border-l-gold"
+                    )}
+                    onClick={() => handleServiceClick(service.id)}
+                  >
+                    {service.popular && (
+                      <span className="absolute -top-2 -right-1 bg-gold text-sapphire text-xs font-bold px-2 py-0.5 rounded-full">
+                        Popular
+                      </span>
+                    )}
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-10 h-10 bg-azure rounded-full flex items-center justify-center text-sapphire">
+                        {service.icon}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-charcoal">{service.title}</h3>
+                        <p className="text-sm text-steel line-clamp-2 mt-1">{service.description}</p>
+                        <div className="flex justify-between items-center mt-2">
+                          <span className="font-bold text-coral">₹{service.price}</span>
+                          <div className="flex items-center text-xs text-steel">
+                            <span>{service.duration}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {/* Active Booking */}
