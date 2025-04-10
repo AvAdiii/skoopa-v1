@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -6,14 +7,109 @@ import { Input } from "@/components/ui/input";
 import { Phone, Mail, ChevronRight, ArrowLeft } from "lucide-react";
 import SkoopaLogo from "@/components/SkoopaLogo";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const navigate = useNavigate();
   const [loginMethod, setLoginMethod] = useState<"phone" | "email">("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [showOtp, setShowOtp] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate("/");
+      }
+    });
+
+    // Set up auth state listener
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        // Store user info in localStorage for easy access
+        localStorage.setItem("skoopa-user", JSON.stringify({
+          id: session.user.id,
+          email: session.user.email,
+          phoneNumber: session.user.phone,
+          isLoggedIn: true
+        }));
+        navigate("/");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  const handleSignInWithEmail = async () => {
+    try {
+      setLoading(true);
+      
+      if (!email) {
+        toast.error("Please enter your email");
+        return;
+      }
+      
+      if (!password) {
+        toast.error("Please enter your password");
+        return;
+      }
+      
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+      
+      // Auth state change listener will handle redirect
+    } catch (error: any) {
+      toast.error(error.message || "Error signing in");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignUpWithEmail = async () => {
+    try {
+      setLoading(true);
+      
+      if (!email) {
+        toast.error("Please enter your email");
+        return;
+      }
+      
+      if (!password) {
+        toast.error("Please enter your password");
+        return;
+      }
+      
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            first_name: "",
+            last_name: "",
+            phone_number: phoneNumber
+          }
+        }
+      });
+
+      if (error) throw error;
+      
+      toast.success("Sign up successful! Please check your email for verification.");
+    } catch (error: any) {
+      toast.error(error.message || "Error signing up");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleContinue = () => {
     if (loginMethod === "phone" && !phoneNumber) {
@@ -28,36 +124,21 @@ const Login = () => {
 
     if (!showOtp) {
       setShowOtp(true);
+      if (loginMethod === "email") {
+        // When email field is shown, we'll also show password field
+        return;
+      }
+      
       toast.success(`OTP sent to your ${loginMethod === "phone" ? "phone" : "email"}`);
       return;
     }
 
-    if (!otp) {
-      toast.error("Please enter the OTP");
-      return;
-    }
-
-    // For demo purposes, we'll just navigate to home
-    localStorage.setItem("skoopa-user", JSON.stringify({
-      firstName: "Rahul",
-      lastName: "Sharma",
-      phoneNumber: phoneNumber || "9876543210",
-      email: email || "user@example.com",
-      isLoggedIn: true
-    }));
-    
-    // Directly navigate without showing success toast
-    window.location.href = "/";
-  };
-
-  const staggerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
+    if (loginMethod === "email") {
+      handleSignInWithEmail();
+    } else {
+      // Phone auth would be handled here
+      // For now, let's show an info message
+      toast.info("Phone authentication will be implemented soon.");
     }
   };
 
@@ -199,6 +280,35 @@ const Login = () => {
                 />
               </div>
             )
+          ) : loginMethod === "email" ? (
+            <motion.div 
+              className="space-y-3"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Input 
+                type="password" 
+                placeholder="Enter your password" 
+                className="border-azure/50 focus:border-coral py-6"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <div className="flex justify-between items-center">
+                <button 
+                  className="text-coral text-sm font-medium"
+                  onClick={() => setShowOtp(false)}
+                >
+                  Change {loginMethod}
+                </button>
+                <button 
+                  className="text-coral text-sm font-medium"
+                  onClick={() => handleSignUpWithEmail()}
+                >
+                  Sign Up Instead
+                </button>
+              </div>
+            </motion.div>
           ) : (
             <motion.div 
               className="space-y-3"
@@ -263,8 +373,9 @@ const Login = () => {
             <Button 
               className="w-full bg-gradient-to-r from-coral to-coral/90 hover:from-coral/90 hover:to-coral gap-2 text-base py-6 shadow-md"
               onClick={handleContinue}
+              disabled={loading}
             >
-              {showOtp ? "Verify & Login" : "Continue"} 
+              {loading ? "Please wait..." : showOtp ? (loginMethod === "email" ? "Login" : "Verify & Login") : "Continue"} 
               <ChevronRight size={18} />
             </Button>
           </motion.div>

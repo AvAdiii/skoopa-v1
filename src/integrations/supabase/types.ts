@@ -9,7 +9,289 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      addresses: {
+        Row: {
+          address: string
+          city: string
+          created_at: string
+          id: string
+          is_default: boolean | null
+          name: string
+          pincode: string
+          state: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          city: string
+          created_at?: string
+          id?: string
+          is_default?: boolean | null
+          name: string
+          pincode: string
+          state: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          created_at?: string
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          pincode?: string
+          state?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      bookings: {
+        Row: {
+          address_id: string
+          booking_date: string
+          booking_time: string
+          created_at: string
+          id: string
+          maid_id: string | null
+          price: number
+          service_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          address_id: string
+          booking_date: string
+          booking_time: string
+          created_at?: string
+          id?: string
+          maid_id?: string | null
+          price: number
+          service_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          address_id?: string
+          booking_date?: string
+          booking_time?: string
+          created_at?: string
+          id?: string
+          maid_id?: string | null
+          price?: number
+          service_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_address_id_fkey"
+            columns: ["address_id"]
+            isOneToOne: false
+            referencedRelation: "addresses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      favorite_maids: {
+        Row: {
+          created_at: string
+          id: string
+          maid_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          maid_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          maid_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorite_maids_maid_id_fkey"
+            columns: ["maid_id"]
+            isOneToOne: false
+            referencedRelation: "maids"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maids: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          image_url: string | null
+          is_available: boolean | null
+          jobs_completed: number | null
+          level: number | null
+          name: string
+          phone_number: string | null
+          rating: number | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean | null
+          jobs_completed?: number | null
+          level?: number | null
+          name: string
+          phone_number?: string | null
+          rating?: number | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean | null
+          jobs_completed?: number | null
+          level?: number | null
+          name?: string
+          phone_number?: string | null
+          rating?: number | null
+        }
+        Relationships: []
+      }
+      payment_methods: {
+        Row: {
+          created_at: string
+          details: Json
+          id: string
+          is_default: boolean | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          details: Json
+          id?: string
+          is_default?: boolean | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json
+          id?: string
+          is_default?: boolean | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          booking_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          maid_id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          booking_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          maid_id: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          booking_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          maid_id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          duration: string
+          icon: string | null
+          id: string
+          is_popular: boolean | null
+          name: string
+          price: number
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          duration: string
+          icon?: string | null
+          id?: string
+          is_popular?: boolean | null
+          name: string
+          price: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          duration?: string
+          icon?: string | null
+          id?: string
+          is_popular?: boolean | null
+          name?: string
+          price?: number
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          created_at: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone_number: string | null
+        }
+        Insert: {
+          created_at?: string
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          phone_number?: string | null
+        }
+        Update: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone_number?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

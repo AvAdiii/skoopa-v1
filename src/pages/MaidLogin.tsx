@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -7,14 +7,29 @@ import { Input } from "@/components/ui/input";
 import { Phone, ChevronRight, ArrowLeft } from "lucide-react";
 import SkoopaLogo from "@/components/SkoopaLogo";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const MaidLogin = () => {
   const navigate = useNavigate();
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [showOtp, setShowOtp] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleContinue = () => {
+  useEffect(() => {
+    // Check if user is already logged in
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/maid");
+      }
+    };
+    
+    checkUser();
+  }, [navigate]);
+
+  const handleContinue = async () => {
     if (!phoneNumber) {
       toast.error("Please enter your phone number");
       return;
@@ -22,18 +37,35 @@ const MaidLogin = () => {
 
     if (!showOtp) {
       setShowOtp(true);
-      toast.success("OTP sent to your phone");
+      toast.success("Please enter your password");
       return;
     }
 
-    if (!otp) {
-      toast.error("Please enter the OTP");
+    if (!password) {
+      toast.error("Please enter the password");
       return;
     }
 
-    // For demo purposes, we'll just navigate to maid dashboard
-    toast.success("Login successful!");
-    navigate("/maid");
+    try {
+      setLoading(true);
+      
+      // Assume maids use their phone number as email (phone@skoopa.com)
+      const email = `${phoneNumber}@skoopa-maid.com`;
+      
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+      
+      toast.success("Login successful!");
+      navigate("/maid");
+    } catch (error: any) {
+      toast.error(error.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -85,31 +117,15 @@ const MaidLogin = () => {
           ) : (
             <div className="space-y-3">
               <p className="text-sm text-charcoal">
-                Enter the OTP sent to +91 {phoneNumber}
+                Enter password for +91 {phoneNumber}
               </p>
-              <div className="flex justify-between gap-2">
-                {[0, 1, 2, 3].map((i) => (
-                  <Input
-                    key={i}
-                    type="tel"
-                    maxLength={1}
-                    className="w-12 h-12 text-center text-lg"
-                    value={otp[i] || ""}
-                    onChange={(e) => {
-                      const newOtp = otp.split("");
-                      newOtp[i] = e.target.value;
-                      setOtp(newOtp.join(""));
-                      
-                      // Auto-focus next input
-                      if (e.target.value && i < 3) {
-                        const nextInput = document.querySelector(`input[name="otp-${i+1}"]`);
-                        if (nextInput) (nextInput as HTMLInputElement).focus();
-                      }
-                    }}
-                    name={`otp-${i}`}
-                  />
-                ))}
-              </div>
+              <Input 
+                type="password" 
+                placeholder="Password" 
+                className="w-full"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
               <div className="flex justify-between items-center">
                 <button 
                   className="text-coral text-sm font-medium"
@@ -119,9 +135,9 @@ const MaidLogin = () => {
                 </button>
                 <button 
                   className="text-coral text-sm font-medium"
-                  onClick={() => toast.success("OTP resent")}
+                  onClick={() => toast.info("Please contact admin to reset password")}
                 >
-                  Resend OTP
+                  Forgot password?
                 </button>
               </div>
             </div>
@@ -130,8 +146,9 @@ const MaidLogin = () => {
           <Button 
             className="w-full bg-coral hover:bg-coral/90 gap-2 text-base py-6"
             onClick={handleContinue}
+            disabled={loading}
           >
-            {showOtp ? "Verify & Login" : "Continue"} 
+            {loading ? "Please wait..." : showOtp ? "Login" : "Continue"} 
             <ChevronRight size={18} />
           </Button>
         </div>
