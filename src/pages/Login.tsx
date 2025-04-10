@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Phone, Mail, ChevronRight, ArrowLeft } from "lucide-react";
 import SkoopaLogo from "@/components/SkoopaLogo";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
@@ -62,12 +63,20 @@ const Login = () => {
       setLoading(true);
       
       if (!email) {
-        toast.error("Please enter your email");
+        toast({
+          title: "Error",
+          description: "Please enter your email",
+          variant: "destructive"
+        });
         return;
       }
       
       if (!password) {
-        toast.error("Please enter your password");
+        toast({
+          title: "Error",
+          description: "Please enter your password",
+          variant: "destructive"
+        });
         return;
       }
       
@@ -78,9 +87,17 @@ const Login = () => {
 
       if (error) throw error;
       
+      toast({
+        title: "Success",
+        description: "Login successful",
+      });
       // Auth state change listener will handle redirect
     } catch (error: any) {
-      toast.error(error.message || "Error signing in");
+      toast({
+        title: "Error",
+        description: error.message || "Error signing in",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
@@ -91,12 +108,20 @@ const Login = () => {
       setLoading(true);
       
       if (!email) {
-        toast.error("Please enter your email");
+        toast({
+          title: "Error",
+          description: "Please enter your email",
+          variant: "destructive"
+        });
         return;
       }
       
       if (!password) {
-        toast.error("Please enter your password");
+        toast({
+          title: "Error",
+          description: "Please enter your password",
+          variant: "destructive"
+        });
         return;
       }
       
@@ -114,42 +139,111 @@ const Login = () => {
 
       if (error) throw error;
       
-      toast.success("Sign up successful! Please check your email for verification.");
+      toast({
+        title: "Success",
+        description: "Sign up successful! Please check your email for verification.",
+      });
     } catch (error: any) {
-      toast.error(error.message || "Error signing up");
+      toast({
+        title: "Error",
+        description: error.message || "Error signing up",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePhoneVerification = async () => {
+    if (!phoneNumber || phoneNumber.length !== 10) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid 10-digit phone number",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Format phone number to include country code
+      const formattedPhone = `+91${phoneNumber}`;
+      
+      // Sign in with phone OTP
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: formattedPhone,
+      });
+
+      if (error) throw error;
+      
+      setShowOtp(true);
+      toast({
+        title: "OTP Sent",
+        description: `OTP sent to your phone number: ${formattedPhone}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error Sending OTP",
+        description: error.message || "Failed to send OTP",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyOtp = async () => {
+    if (!otp || otp.length !== 6) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid 6-digit OTP",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const formattedPhone = `+91${phoneNumber}`;
+      
+      // Verify the OTP
+      const { error } = await supabase.auth.verifyOtp({
+        phone: formattedPhone,
+        token: otp,
+        type: 'sms',
+      });
+
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "Phone number verified successfully!",
+      });
+      // Auth state change listener will handle redirect
+    } catch (error: any) {
+      toast({
+        title: "Verification Failed",
+        description: error.message || "Invalid OTP. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const handleContinue = () => {
-    if (loginMethod === "phone" && !phoneNumber) {
-      toast.error("Please enter your phone number");
-      return;
-    }
-
-    if (loginMethod === "email" && !email) {
-      toast.error("Please enter your email");
-      return;
-    }
-
-    if (!showOtp) {
-      setShowOtp(true);
-      if (loginMethod === "email") {
-        // When email field is shown, we'll also show password field
-        return;
+    if (loginMethod === "phone") {
+      if (!showOtp) {
+        handlePhoneVerification();
+      } else {
+        verifyOtp();
       }
-      
-      toast.success(`OTP sent to your ${loginMethod === "phone" ? "phone" : "email"}`);
-      return;
-    }
-
-    if (loginMethod === "email") {
-      handleSignInWithEmail();
-    } else {
-      // Phone auth would be handled here
-      // For now, let's show an info message
-      toast.info("Phone authentication will be implemented soon.");
+    } else { // email login
+      if (!showOtp) {
+        setShowOtp(true);
+      } else {
+        handleSignInWithEmail();
+      }
     }
   };
 
@@ -248,13 +342,19 @@ const Login = () => {
           ></div>
           <button 
             className={`flex-1 py-2 text-center rounded-md relative z-10 transition-colors duration-300 ${loginMethod === "phone" ? "text-white font-medium" : "text-steel"}`} 
-            onClick={() => setLoginMethod("phone")}
+            onClick={() => {
+              setLoginMethod("phone");
+              setShowOtp(false);
+            }}
           >
             Phone
           </button>
           <button 
             className={`flex-1 py-2 text-center rounded-md relative z-10 transition-colors duration-300 ${loginMethod === "email" ? "text-white font-medium" : "text-steel"}`}
-            onClick={() => setLoginMethod("email")}
+            onClick={() => {
+              setLoginMethod("email");
+              setShowOtp(false);
+            }}
           >
             Email
           </button>
@@ -275,7 +375,13 @@ const Login = () => {
                   placeholder="Phone number" 
                   className="pl-24 border-azure/50 focus:border-coral py-6"
                   value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  onChange={(e) => {
+                    // Only allow numbers
+                    const value = e.target.value.replace(/\D/g, '');
+                    if (value.length <= 10) {
+                      setPhoneNumber(value);
+                    }
+                  }}
                   maxLength={10}
                 />
               </div>
@@ -328,36 +434,23 @@ const Login = () => {
               transition={{ duration: 0.3 }}
             >
               <p className="text-sm text-charcoal">
-                Enter the OTP sent to {loginMethod === "phone" ? `+91 ${phoneNumber}` : email}
+                Enter the OTP sent to +91 {phoneNumber}
               </p>
-              <div className="flex justify-between gap-2">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1, duration: 0.3 }}
-                  >
-                    <Input
-                      type="tel"
-                      maxLength={1}
-                      className="w-14 h-14 text-center text-lg border-azure/50 focus:border-coral"
-                      value={otp[i] || ""}
-                      onChange={(e) => {
-                        const newOtp = otp.split("");
-                        newOtp[i] = e.target.value;
-                        setOtp(newOtp.join(""));
-                        
-                        // Auto-focus next input
-                        if (e.target.value && i < 3) {
-                          const nextInput = document.querySelector(`input[name="otp-${i+1}"]`);
-                          if (nextInput) (nextInput as HTMLInputElement).focus();
-                        }
-                      }}
-                      name={`otp-${i}`}
-                    />
-                  </motion.div>
-                ))}
+              <div className="flex justify-center">
+                <InputOTP 
+                  maxLength={6} 
+                  value={otp} 
+                  onChange={setOtp}
+                >
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
               </div>
               <div className="flex justify-between items-center">
                 <button 
@@ -368,7 +461,11 @@ const Login = () => {
                 </button>
                 <button 
                   className="text-coral text-sm font-medium"
-                  onClick={() => toast.success("OTP resent")}
+                  onClick={() => {
+                    setLoading(true);
+                    handlePhoneVerification().finally(() => setLoading(false));
+                  }}
+                  disabled={loading}
                 >
                   Resend OTP
                 </button>
