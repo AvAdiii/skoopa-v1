@@ -33,9 +33,11 @@ const ActiveBooking = ({ booking, onClose }: ActiveBookingProps) => {
   
   // Update visibility based on scroll position
   useEffect(() => {
-    return scrollY.onChange(latest => {
+    const unsubscribe = scrollY.on("change", latest => {
       setIsVisible(latest < 200);
     });
+    
+    return () => unsubscribe();
   }, [scrollY]);
   
   if (!isVisible) return null;

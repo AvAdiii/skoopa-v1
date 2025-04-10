@@ -5,9 +5,10 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const ReviewBooking = () => {
+  const { toast } = useToast();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [rating, setRating] = useState(0);
