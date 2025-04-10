@@ -1,11 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Phone, Mail, ChevronRight, ArrowLeft } from "lucide-react";
+import { Phone, Mail, ChevronRight } from "lucide-react";
 import SkoopaLogo from "@/components/SkoopaLogo";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,11 +14,10 @@ const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [otp, setOtp] = useState("");
-  const [showOtp, setShowOtp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Define the missing staggerVariants
+  // Define the staggerVariants
   const staggerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -154,76 +151,86 @@ const Login = () => {
     }
   };
 
-  const handlePhoneVerification = async () => {
-    if (!phoneNumber || phoneNumber.length !== 10) {
-      toast({
-        title: "Error",
-        description: "Please enter a valid 10-digit phone number",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setLoading(true);
+  const handlePhoneLogin = async () => {
     try {
-      // Format phone number to include country code
-      const formattedPhone = `+91${phoneNumber}`;
+      setLoading(true);
       
-      // Sign in with phone OTP
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: formattedPhone,
-      });
-
-      if (error) throw error;
+      if (!phoneNumber || phoneNumber.length !== 10) {
+        toast({
+          title: "Error",
+          description: "Please enter a valid 10-digit phone number",
+          variant: "destructive"
+        });
+        return;
+      }
       
-      setShowOtp(true);
-      toast({
-        title: "OTP Sent",
-        description: `OTP sent to your phone number: ${formattedPhone}`,
-      });
+      if (!password && showPassword) {
+        toast({
+          title: "Error",
+          description: "Please enter your password",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // For phone authentication, create a unique email based on phone number
+      const phoneEmail = `+91${phoneNumber}@skoopa.com`;
+      
+      // Check if user exists
+      const { data, error: checkError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('phone_number', `+91${phoneNumber}`)
+        .maybeSingle();
+      
+      if (checkError) throw checkError;
+      
+      if (!data && !showPassword) {
+        // Show password field for registration
+        setShowPassword(true);
+        setLoading(false);
+        return;
+      }
+      
+      if (!data && showPassword) {
+        // Register new user
+        const { error } = await supabase.auth.signUp({
+          email: phoneEmail,
+          password: password,
+          options: {
+            data: {
+              phone_number: `+91${phoneNumber}`
+            }
+          }
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "Account created successfully!",
+        });
+      } else if (data && showPassword) {
+        // Sign in existing user
+        const { error } = await supabase.auth.signInWithPassword({
+          email: phoneEmail,
+          password: password,
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "Login successful",
+        });
+      } else {
+        // Existing user, show password field
+        setShowPassword(true);
+      }
     } catch (error: any) {
       toast({
-        title: "Error Sending OTP",
-        description: error.message || "Failed to send OTP",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const verifyOtp = async () => {
-    if (!otp || otp.length !== 6) {
-      toast({
         title: "Error",
-        description: "Please enter a valid 6-digit OTP",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const formattedPhone = `+91${phoneNumber}`;
-      
-      // Verify the OTP
-      const { error } = await supabase.auth.verifyOtp({
-        phone: formattedPhone,
-        token: otp,
-        type: 'sms',
-      });
-
-      if (error) throw error;
-      
-      toast({
-        title: "Success",
-        description: "Phone number verified successfully!",
-      });
-      // Auth state change listener will handle redirect
-    } catch (error: any) {
-      toast({
-        title: "Verification Failed",
-        description: error.message || "Invalid OTP. Please try again.",
+        description: error.message || "Authentication failed",
         variant: "destructive"
       });
     } finally {
@@ -233,14 +240,10 @@ const Login = () => {
 
   const handleContinue = () => {
     if (loginMethod === "phone") {
-      if (!showOtp) {
-        handlePhoneVerification();
-      } else {
-        verifyOtp();
-      }
+      handlePhoneLogin();
     } else { // email login
-      if (!showOtp) {
-        setShowOtp(true);
+      if (!showPassword) {
+        setShowPassword(true);
       } else {
         handleSignInWithEmail();
       }
@@ -344,7 +347,7 @@ const Login = () => {
             className={`flex-1 py-2 text-center rounded-md relative z-10 transition-colors duration-300 ${loginMethod === "phone" ? "text-white font-medium" : "text-steel"}`} 
             onClick={() => {
               setLoginMethod("phone");
-              setShowOtp(false);
+              setShowPassword(false);
             }}
           >
             Phone
@@ -353,7 +356,7 @@ const Login = () => {
             className={`flex-1 py-2 text-center rounded-md relative z-10 transition-colors duration-300 ${loginMethod === "email" ? "text-white font-medium" : "text-steel"}`}
             onClick={() => {
               setLoginMethod("email");
-              setShowOtp(false);
+              setShowPassword(false);
             }}
           >
             Email
@@ -365,7 +368,7 @@ const Login = () => {
           className="space-y-4"
           variants={itemVariants}
         >
-          {!showOtp ? (
+          {!showPassword ? (
             loginMethod === "phone" ? (
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel w-5 h-5" />
@@ -397,7 +400,7 @@ const Login = () => {
                 />
               </div>
             )
-          ) : loginMethod === "email" ? (
+          ) : (
             <motion.div 
               className="space-y-3"
               initial={{ opacity: 0, y: 10 }}
@@ -414,61 +417,18 @@ const Login = () => {
               <div className="flex justify-between items-center">
                 <button 
                   className="text-coral text-sm font-medium"
-                  onClick={() => setShowOtp(false)}
+                  onClick={() => setShowPassword(false)}
                 >
                   Change {loginMethod}
                 </button>
-                <button 
-                  className="text-coral text-sm font-medium"
-                  onClick={() => handleSignUpWithEmail()}
-                >
-                  Sign Up Instead
-                </button>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div 
-              className="space-y-3"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <p className="text-sm text-charcoal">
-                Enter the OTP sent to +91 {phoneNumber}
-              </p>
-              <div className="flex justify-center">
-                <InputOTP 
-                  maxLength={6} 
-                  value={otp} 
-                  onChange={setOtp}
-                >
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
-                    <InputOTPSlot index={3} />
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
-                  </InputOTPGroup>
-                </InputOTP>
-              </div>
-              <div className="flex justify-between items-center">
-                <button 
-                  className="text-coral text-sm font-medium"
-                  onClick={() => setShowOtp(false)}
-                >
-                  Change {loginMethod}
-                </button>
-                <button 
-                  className="text-coral text-sm font-medium"
-                  onClick={() => {
-                    setLoading(true);
-                    handlePhoneVerification().finally(() => setLoading(false));
-                  }}
-                  disabled={loading}
-                >
-                  Resend OTP
-                </button>
+                {loginMethod === "email" && (
+                  <button 
+                    className="text-coral text-sm font-medium"
+                    onClick={() => handleSignUpWithEmail()}
+                  >
+                    Sign Up Instead
+                  </button>
+                )}
               </div>
             </motion.div>
           )}
@@ -483,7 +443,7 @@ const Login = () => {
               onClick={handleContinue}
               disabled={loading}
             >
-              {loading ? "Please wait..." : showOtp ? (loginMethod === "email" ? "Login" : "Verify & Login") : "Continue"} 
+              {loading ? "Please wait..." : showPassword ? (loginMethod === "email" ? "Login" : "Login/Sign Up") : "Continue"} 
               <ChevronRight size={18} />
             </Button>
           </motion.div>
