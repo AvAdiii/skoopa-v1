@@ -1,20 +1,22 @@
 
 import { useState } from "react";
-import { ArrowLeft, Bell, Calendar, Home, MapPin, User, ChevronRight, Phone, Clock } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowLeft, Bell, Calendar, Home, MapPin, User, ChevronRight, Phone, Clock, LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import SkoopaLogo from "@/components/SkoopaLogo";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { toast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 // MaidDashboard component
 const MaidDashboard = () => {
+  const navigate = useNavigate();
   const [isAvailable, setIsAvailable] = useState(true);
   const [currentTab, setCurrentTab] = useState<"jobs" | "earnings" | "profile">("jobs");
-  const [sliderValue, setSliderValue] = useState([isAvailable ? 80 : 20]);
-
+  
   // Fix for the type error - making sure the image property is a string, not string[]
   const maidProfile = {
     name: "Lakshmi Devi",
@@ -26,7 +28,7 @@ const MaidDashboard = () => {
       week: "₹3,250",
       month: "₹12,500"
     },
-    // Using a placeholder image with fallback
+    // Using a placeholder image
     image: "https://ui-avatars.com/api/?name=Lakshmi+Devi&background=FFC0CB&color=800080&size=256"
   };
 
@@ -72,15 +74,32 @@ const MaidDashboard = () => {
     { day: "Sun", amount: 300 }
   ];
   
-  // Handle slider change for availability
-  const handleSliderChange = (values: number[]) => {
-    setSliderValue(values);
-    setIsAvailable(values[0] > 50);
+  // Handle availability toggle
+  const handleAvailabilityToggle = (checked: boolean) => {
+    setIsAvailable(checked);
+    toast({
+      title: checked ? "You are now available" : "You are now unavailable",
+      description: checked ? "You will receive new job requests" : "You will not receive new job requests",
+    });
+  };
+  
+  // Handle logout
+  const handleLogout = () => {
+    // Clear user data from localStorage
+    localStorage.removeItem("skoopa-maid");
+    
+    toast({
+      title: "Logged out",
+      description: "You have been logged out successfully",
+    });
+    
+    // Redirect to login page
+    window.location.href = "/maid-login";
   };
 
   // Job details popover
   const JobDetailsPopover = ({ job }: { job: typeof upcomingJobs[0] }) => (
-    <PopoverContent className="w-80 p-0">
+    <PopoverContent className="w-80 p-0" align="center" side="top">
       <div className="p-4 border-b border-smoke">
         <h3 className="font-bold text-lg">{job.serviceType}</h3>
         <p className="text-sm text-steel">{job.date} at {job.time}</p>
@@ -124,18 +143,24 @@ const MaidDashboard = () => {
     </PopoverContent>
   );
 
-  // Function to render the earnings chart
-  const renderChart = () => (
+  // Function to render the earnings bar chart
+  const renderBarChart = () => (
     <div className="h-40 flex items-end justify-between gap-1 mt-4 px-2">
       {earningsData.map((data, index) => (
         <div key={index} className="flex flex-col items-center">
-          <div 
-            className="w-8 bg-gradient-to-t from-coral to-gold rounded-t-lg"
-            style={{ 
-              height: `${(data.amount / 850) * 100}%`,
-              opacity: data.day === "Sun" ? 0.7 : 1
-            }}
-          ></div>
+          <div className="flex flex-col items-center justify-end h-full">
+            <div 
+              className="w-8 bg-gradient-to-t from-coral to-gold rounded-t-lg relative overflow-hidden"
+              style={{ 
+                height: `${(data.amount / 850) * 100}%`,
+                opacity: data.day === "Sun" ? 0.7 : 1
+              }}
+            >
+              <div className="absolute bottom-1 left-0 right-0 text-center text-xs text-white font-bold">
+                {data.amount}
+              </div>
+            </div>
+          </div>
           <p className="text-xs text-steel mt-1">{data.day}</p>
         </div>
       ))}
@@ -157,31 +182,29 @@ const MaidDashboard = () => {
         </div>
       </div>
 
-      {/* Maid Availability with Slider */}
+      {/* Maid Availability with Large Switch */}
       <div className="bg-coral/5 p-4">
         <h2 className="text-sapphire font-bold text-center mb-3">Availability</h2>
-        <div className="flex items-center justify-center gap-4 mb-2">
-          <span className={`text-sm ${!isAvailable ? "font-bold text-red-600" : "text-steel"}`}>
-            Unavailable
-          </span>
-          <div className="w-40">
-            <Slider
-              value={sliderValue}
-              max={100}
-              step={1}
-              onValueChange={handleSliderChange}
-              className={`${isAvailable ? "bg-green-100" : "bg-red-100"}`}
+        <div className="flex flex-col items-center justify-center gap-4 mb-2">
+          <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-smoke shadow-sm">
+            <span className={`text-sm ${!isAvailable ? "font-bold text-red-600" : "text-steel"}`}>
+              Unavailable
+            </span>
+            <Switch 
+              checked={isAvailable} 
+              onCheckedChange={handleAvailabilityToggle}
+              className="scale-150 data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-red-500"
             />
+            <span className={`text-sm ${isAvailable ? "font-bold text-green-600" : "text-steel"}`}>
+              Available
+            </span>
           </div>
-          <span className={`text-sm ${isAvailable ? "font-bold text-green-600" : "text-steel"}`}>
-            Available
-          </span>
+          <p className="text-center text-sm text-steel">
+            {isAvailable 
+              ? "You are currently available for new jobs" 
+              : "You are currently not accepting new jobs"}
+          </p>
         </div>
-        <p className="text-center text-sm text-steel">
-          {isAvailable 
-            ? "You are currently available for new jobs" 
-            : "You are currently not accepting new jobs"}
-        </p>
       </div>
 
       {/* Maid Profile */}
@@ -300,10 +323,10 @@ const MaidDashboard = () => {
             </div>
           </div>
           
-          {/* Earnings Chart */}
+          {/* Earnings Bar Chart */}
           <div className="bg-white rounded-xl border border-smoke p-4">
             <h3 className="font-medium text-charcoal mb-2">Weekly Earnings</h3>
-            {renderChart()}
+            {renderBarChart()}
             <div className="mt-3 flex justify-between items-center">
               <p className="text-xs text-steel">Last 7 days</p>
               <p className="text-sm font-bold text-coral">Total: ₹4,000</p>
@@ -355,6 +378,16 @@ const MaidDashboard = () => {
                 <ChevronRight size={18} className="text-steel" />
               </div>
             </div>
+            
+            {/* Logout Button */}
+            <Button 
+              variant="destructive" 
+              className="w-full mt-6 flex items-center justify-center gap-2"
+              onClick={handleLogout}
+            >
+              <LogOut size={16} />
+              Logout
+            </Button>
           </div>
         </motion.div>
       )}

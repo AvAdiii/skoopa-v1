@@ -64,6 +64,37 @@ const PREMIUM_SERVICES = [
     duration: "4 hours",
     popular: true,
     id: "deep-cleaning"
+  },
+  {
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/>
+        <path d="M12 6v6l4 2"/>
+      </svg>
+    ),
+    title: "Diwali Special",
+    description: "Complete home cleaning and decoration for the festival of lights.",
+    price: "999",
+    duration: "6 hours",
+    popular: true,
+    id: "diwali-special"
+  },
+  {
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"></path>
+        <path d="m8 16 4-4 4 4"></path>
+        <path d="M8 16v4"></path>
+        <path d="M16 16v4"></path>
+        <path d="M12 12v8"></path>
+      </svg>
+    ),
+    title: "Maid Replacement Guarantee",
+    description: "Never worry about your maid's absence with our replacement guarantee.",
+    price: "599",
+    duration: "Monthly",
+    popular: false,
+    id: "maid-insurance"
   }
 ];
 
@@ -106,16 +137,13 @@ const Index = () => {
   
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    setIsSearching(true);
     
-    // Simulate search results
-    const allServices = [...REGULAR_SERVICES, ...PREMIUM_SERVICES];
-    const results = allServices.filter(service => 
-      service.title.toLowerCase().includes(query.toLowerCase()) ||
-      service.description.toLowerCase().includes(query.toLowerCase())
-    );
-    
-    setSearchResults(results);
+    if (query.trim()) {
+      setIsSearching(true);
+      
+      // Redirect to search page with query
+      navigate("/search");
+    }
   };
 
   const handleServiceClick = (serviceId: string) => {

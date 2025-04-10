@@ -178,11 +178,12 @@ const Profile = () => {
         </button>
 
         {/* App version */}
-        <div className="flex justify-center mt-8">
+        <div className="flex flex-col items-center mt-8 gap-1">
           <div className="flex items-center">
             <SkoopaLogo variant="icon" className="w-6 h-6 mr-2" />
-            <span className="text-xs text-steel">Version 1.0.0</span>
+            <span className="text-sm text-steel">Made in India</span>
           </div>
+          <span className="text-xs text-steel">Created with ❤️ in Hyderabad</span>
         </div>
       </div>
 
