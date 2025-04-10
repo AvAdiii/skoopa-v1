@@ -1,5 +1,5 @@
 
-import { Clock, MapPin, X } from "lucide-react";
+import { Clock, X } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
@@ -33,7 +33,7 @@ const ActiveBooking = ({ booking, onClose }: ActiveBookingProps) => {
   
   // Update visibility based on scroll position
   useEffect(() => {
-    const unsubscribe = scrollY.on("change", latest => {
+    const unsubscribe = scrollY.onChange(latest => {
       setIsVisible(latest < 200);
     });
     
