@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -29,6 +28,7 @@ const Login = () => {
 
     if (!showOtp) {
       setShowOtp(true);
+      toast.success(`OTP sent to your ${loginMethod === "phone" ? "phone" : "email"}`);
       return;
     }
 
@@ -37,16 +37,16 @@ const Login = () => {
       return;
     }
 
-    // For demo purposes, set user in localStorage and navigate to home
+    // For demo purposes, we'll just navigate to home
     localStorage.setItem("skoopa-user", JSON.stringify({
-      firstName: "Ravi",
-      lastName: "Kumar",
+      firstName: "Rahul",
+      lastName: "Sharma",
       phoneNumber: phoneNumber || "9876543210",
       email: email || "user@example.com",
       isLoggedIn: true
     }));
     
-    // Force page reload to ensure App.tsx picks up the login state change
+    // Directly navigate without showing success toast
     window.location.href = "/";
   };
 

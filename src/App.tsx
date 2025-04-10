@@ -18,14 +18,7 @@ import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      staleTime: 1000 * 60 * 5, // 5 minutes
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
@@ -40,18 +33,8 @@ const App = () => {
         setIsLoggedIn(!!userData.isLoggedIn);
       } catch (e) {
         console.error("Error parsing user data", e);
-        setIsLoggedIn(false);
       }
-    } else {
-      setIsLoggedIn(false);
     }
-    
-    // Set timeout to hide splash screen after 2 seconds
-    const timer = setTimeout(() => {
-      setShowSplash(false);
-    }, 2000);
-    
-    return () => clearTimeout(timer);
   }, []);
 
   const handleSplashFinish = () => {
@@ -76,30 +59,28 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner position="top-center" />
-        <div className="max-w-md mx-auto min-h-screen relative bg-background">
-          <BrowserRouter>
-            <Routes>
-              {/* Auth routes */}
-              <Route path="/login" element={isLoggedIn ? <Navigate to="/" /> : <Login />} />
-              <Route path="/maid-login" element={<MaidLogin />} />
-              
-              {/* Protected customer routes */}
-              <Route path="/" element={isLoggedIn ? <Index /> : <Navigate to="/login" />} />
-              <Route path="/bookings" element={isLoggedIn ? <Bookings /> : <Navigate to="/login" />} />
-              <Route path="/payments" element={isLoggedIn ? <Payments /> : <Navigate to="/login" />} />
-              <Route path="/chat" element={isLoggedIn ? <Chat /> : <Navigate to="/login" />} />
-              <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
-              <Route path="/notifications" element={isLoggedIn ? <Notifications /> : <Navigate to="/login" />} />
-              <Route path="/service/:serviceType" element={isLoggedIn ? <ServiceBooking /> : <Navigate to="/login" />} />
-              
-              {/* Maid interface routes */}
-              <Route path="/maid" element={<MaidDashboard />} />
-              
-              {/* Catch-all route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </div>
+        <BrowserRouter>
+          <Routes>
+            {/* Auth routes */}
+            <Route path="/login" element={isLoggedIn ? <Navigate to="/" /> : <Login />} />
+            <Route path="/maid-login" element={<MaidLogin />} />
+            
+            {/* Protected customer routes */}
+            <Route path="/" element={isLoggedIn ? <Index /> : <Navigate to="/login" />} />
+            <Route path="/bookings" element={isLoggedIn ? <Bookings /> : <Navigate to="/login" />} />
+            <Route path="/payments" element={isLoggedIn ? <Payments /> : <Navigate to="/login" />} />
+            <Route path="/chat" element={isLoggedIn ? <Chat /> : <Navigate to="/login" />} />
+            <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
+            <Route path="/notifications" element={isLoggedIn ? <Notifications /> : <Navigate to="/login" />} />
+            <Route path="/service/:serviceType" element={isLoggedIn ? <ServiceBooking /> : <Navigate to="/login" />} />
+            
+            {/* Maid interface routes */}
+            <Route path="/maid" element={<MaidDashboard />} />
+            
+            {/* Catch-all route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   );
