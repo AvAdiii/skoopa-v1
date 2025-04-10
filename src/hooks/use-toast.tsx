@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -53,6 +54,9 @@ interface State {
   toasts: ToasterToast[]
 }
 
+// Create a separate module-scope variable for dispatch function
+let _dispatch: React.Dispatch<Action> | undefined;
+
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 
 const addToRemoveQueue = (toastId: string) => {
@@ -62,10 +66,12 @@ const addToRemoveQueue = (toastId: string) => {
 
   const timeout = setTimeout(() => {
     toastTimeouts.delete(toastId)
-    dispatch({
-      type: "REMOVE_TOAST",
-      toastId: toastId,
-    })
+    if (_dispatch) {
+      _dispatch({
+        type: "REMOVE_TOAST",
+        toastId: toastId,
+      })
+    }
   }, TOAST_REMOVE_DELAY)
 
   toastTimeouts.set(toastId, timeout)
@@ -139,6 +145,14 @@ const initialState: State = { toasts: [] };
 // Create a provider component
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = React.useReducer(reducer, initialState);
+  
+  // Set the dispatch function to our module-scope variable
+  React.useEffect(() => {
+    _dispatch = dispatch;
+    return () => {
+      _dispatch = undefined;
+    };
+  }, [dispatch]);
 
   const toast = React.useCallback(
     (props: Omit<ToasterToast, "id">) => {
@@ -209,5 +223,16 @@ export const toast = (props: Omit<ToasterToast, "id">) => {
     };
   }
   
-  return useToast().toast(props);
+  // We need to ensure this is only called in a component context
+  try {
+    return useToast().toast(props);
+  } catch (e) {
+    console.error("Toast was called outside of a valid React component tree", e);
+    // Return dummy functions as fallback
+    return {
+      id: "error-toast",
+      dismiss: () => {},
+      update: () => {},
+    };
+  }
 };
