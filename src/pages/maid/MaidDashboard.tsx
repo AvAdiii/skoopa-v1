@@ -1,13 +1,19 @@
+
 import { useState } from "react";
 import { ArrowLeft, Bell, Calendar, Home, MapPin, User, ChevronRight, Phone, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import SkoopaLogo from "@/components/SkoopaLogo";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 
 // MaidDashboard component
 const MaidDashboard = () => {
   const [isAvailable, setIsAvailable] = useState(true);
   const [currentTab, setCurrentTab] = useState<"jobs" | "earnings" | "profile">("jobs");
+  const [sliderValue, setSliderValue] = useState([isAvailable ? 80 : 20]);
 
   // Fix for the type error - making sure the image property is a string, not string[]
   const maidProfile = {
@@ -20,8 +26,8 @@ const MaidDashboard = () => {
       week: "₹3,250",
       month: "₹12,500"
     },
-    // Making sure this is a string instead of a string array
-    image: "/path/to/profile-image.jpg"
+    // Using a placeholder image with fallback
+    image: "https://ui-avatars.com/api/?name=Lakshmi+Devi&background=FFC0CB&color=800080&size=256"
   };
 
   const upcomingJobs = [
@@ -33,7 +39,11 @@ const MaidDashboard = () => {
       date: "Today",
       serviceType: "Regular Cleaning",
       duration: "1.5 hours",
-      amount: "₹350"
+      amount: "₹350",
+      location: {
+        lat: 12.9352,
+        lng: 77.6245
+      }
     },
     {
       id: "2",
@@ -43,7 +53,11 @@ const MaidDashboard = () => {
       date: "Today",
       serviceType: "Kitchen Cleaning",
       duration: "2 hours",
-      amount: "₹450"
+      amount: "₹450",
+      location: {
+        lat: 12.9784,
+        lng: 77.6408
+      }
     }
   ];
 
@@ -57,6 +71,76 @@ const MaidDashboard = () => {
     { day: "Sat", amount: 850 },
     { day: "Sun", amount: 300 }
   ];
+  
+  // Handle slider change for availability
+  const handleSliderChange = (values: number[]) => {
+    setSliderValue(values);
+    setIsAvailable(values[0] > 50);
+  };
+
+  // Job details popover
+  const JobDetailsPopover = ({ job }: { job: typeof upcomingJobs[0] }) => (
+    <PopoverContent className="w-80 p-0">
+      <div className="p-4 border-b border-smoke">
+        <h3 className="font-bold text-lg">{job.serviceType}</h3>
+        <p className="text-sm text-steel">{job.date} at {job.time}</p>
+      </div>
+      <div className="p-4 space-y-3">
+        <div>
+          <p className="text-sm font-medium">Customer</p>
+          <p className="text-sm">{job.customerName}</p>
+        </div>
+        <div>
+          <p className="text-sm font-medium">Address</p>
+          <p className="text-sm">{job.address}</p>
+        </div>
+        <div>
+          <p className="text-sm font-medium">Duration</p>
+          <p className="text-sm">{job.duration}</p>
+        </div>
+        <div>
+          <p className="text-sm font-medium">Payment</p>
+          <p className="text-sm font-bold text-coral">{job.amount}</p>
+        </div>
+      </div>
+      <div className="p-4 border-t border-smoke">
+        <div className="bg-gray-200 rounded-lg h-[150px] relative overflow-hidden">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <MapPin size={32} className="text-coral" />
+            <span className="text-xs font-medium bg-white px-2 py-1 rounded absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              View Map
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className="p-4 flex gap-2">
+        <button className="bg-coral text-white px-4 py-2 rounded-lg text-sm font-medium flex-1">
+          Get Directions
+        </button>
+        <button className="border border-coral text-coral px-4 py-2 rounded-lg text-sm font-medium flex-1">
+          Contact Customer
+        </button>
+      </div>
+    </PopoverContent>
+  );
+
+  // Function to render the earnings chart
+  const renderChart = () => (
+    <div className="h-40 flex items-end justify-between gap-1 mt-4 px-2">
+      {earningsData.map((data, index) => (
+        <div key={index} className="flex flex-col items-center">
+          <div 
+            className="w-8 bg-gradient-to-t from-coral to-gold rounded-t-lg"
+            style={{ 
+              height: `${(data.amount / 850) * 100}%`,
+              opacity: data.day === "Sun" ? 0.7 : 1
+            }}
+          ></div>
+          <p className="text-xs text-steel mt-1">{data.day}</p>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-white pb-8">
@@ -73,19 +157,31 @@ const MaidDashboard = () => {
         </div>
       </div>
 
-      {/* Maid Availability */}
+      {/* Maid Availability with Slider */}
       <div className="bg-coral/5 p-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sapphire font-bold">Availability</h2>
-          <button
-            className={`px-4 py-2 rounded-full font-medium text-sm ${
-              isAvailable ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
-            }`}
-            onClick={() => setIsAvailable(!isAvailable)}
-          >
-            {isAvailable ? "Available" : "Unavailable"}
-          </button>
+        <h2 className="text-sapphire font-bold text-center mb-3">Availability</h2>
+        <div className="flex items-center justify-center gap-4 mb-2">
+          <span className={`text-sm ${!isAvailable ? "font-bold text-red-600" : "text-steel"}`}>
+            Unavailable
+          </span>
+          <div className="w-40">
+            <Slider
+              value={sliderValue}
+              max={100}
+              step={1}
+              onValueChange={handleSliderChange}
+              className={`${isAvailable ? "bg-green-100" : "bg-red-100"}`}
+            />
+          </div>
+          <span className={`text-sm ${isAvailable ? "font-bold text-green-600" : "text-steel"}`}>
+            Available
+          </span>
         </div>
+        <p className="text-center text-sm text-steel">
+          {isAvailable 
+            ? "You are currently available for new jobs" 
+            : "You are currently not accepting new jobs"}
+        </p>
       </div>
 
       {/* Maid Profile */}
@@ -95,11 +191,10 @@ const MaidDashboard = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <img
-          src={maidProfile.image}
-          alt={maidProfile.name}
-          className="w-16 h-16 rounded-full object-cover"
-        />
+        <Avatar className="w-16 h-16 border-2 border-primary">
+          <AvatarImage src={maidProfile.image} alt={maidProfile.name} />
+          <AvatarFallback>{maidProfile.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+        </Avatar>
         <div>
           <h2 className="text-xl font-bold text-charcoal">{maidProfile.name}</h2>
           <div className="flex items-center gap-1 text-sm text-amber-500">
@@ -154,23 +249,28 @@ const MaidDashboard = () => {
           <h2 className="text-lg font-bold text-sapphire mb-4">Upcoming Jobs</h2>
           <div className="space-y-4">
             {upcomingJobs.map((job) => (
-              <div key={job.id} className="bg-white rounded-xl border border-smoke p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium text-charcoal">{job.customerName}</h3>
-                  <span className="text-sm text-steel">{job.time}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-steel mb-2">
-                  <MapPin size={14} />
-                  {job.address}
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <Clock size={14} />
-                    {job.duration}
+              <Popover key={job.id}>
+                <PopoverTrigger asChild>
+                  <div className="bg-white rounded-xl border border-smoke p-4 cursor-pointer hover:border-azure transition-colors">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium text-charcoal">{job.customerName}</h3>
+                      <span className="text-sm text-steel">{job.time}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-steel mb-2">
+                      <MapPin size={14} />
+                      {job.address}
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <Clock size={14} />
+                        {job.duration}
+                      </div>
+                      <div className="font-bold text-charcoal">{job.amount}</div>
+                    </div>
                   </div>
-                  <div className="font-bold text-charcoal">{job.amount}</div>
-                </div>
-              </div>
+                </PopoverTrigger>
+                <JobDetailsPopover job={job} />
+              </Popover>
             ))}
           </div>
         </motion.div>
@@ -199,10 +299,15 @@ const MaidDashboard = () => {
               <p className="text-xl font-bold text-charcoal">{maidProfile.earnings.month}</p>
             </div>
           </div>
-          {/* Earnings Chart (Placeholder) */}
+          
+          {/* Earnings Chart */}
           <div className="bg-white rounded-xl border border-smoke p-4">
-            <h3 className="font-medium text-charcoal mb-2">Earnings Chart</h3>
-            <p className="text-sm text-steel">Visual representation of your earnings over the past week.</p>
+            <h3 className="font-medium text-charcoal mb-2">Weekly Earnings</h3>
+            {renderChart()}
+            <div className="mt-3 flex justify-between items-center">
+              <p className="text-xs text-steel">Last 7 days</p>
+              <p className="text-sm font-bold text-coral">Total: ₹4,000</p>
+            </div>
           </div>
         </motion.div>
       )}
@@ -218,11 +323,10 @@ const MaidDashboard = () => {
           <h2 className="text-lg font-bold text-sapphire mb-4">Profile</h2>
           <div className="bg-white rounded-xl border border-smoke p-4">
             <div className="flex items-center gap-4 mb-4">
-              <img
-                src={maidProfile.image}
-                alt={maidProfile.name}
-                className="w-12 h-12 rounded-full object-cover"
-              />
+              <Avatar className="w-12 h-12">
+                <AvatarImage src={maidProfile.image} alt={maidProfile.name} />
+                <AvatarFallback>{maidProfile.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+              </Avatar>
               <div>
                 <h3 className="font-medium text-charcoal">{maidProfile.name}</h3>
                 <p className="text-sm text-steel">Level {maidProfile.level}</p>
