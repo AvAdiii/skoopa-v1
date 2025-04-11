@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   Home, Bell, User, LogOut, CheckCircle, Calendar, Clock, 
-  MapPin, Phone, Star, AlertCircle, CoinIcon, DollarSign
+  MapPin, Phone, Star, AlertCircle, Coins, DollarSign
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import SkoopaLogo from "@/components/SkoopaLogo";
@@ -119,7 +118,7 @@ const MaidDashboard = () => {
                 <span className="font-bold text-amber-500">{maidData.rating}</span>
               </div>
               <div className="mt-1 flex items-center gap-2">
-                <CoinIcon className="w-4 h-4 text-gold" />
+                <Coins className="w-4 h-4 text-gold" />
                 <span className="text-gold font-medium">{maidData.skoops} Skoops</span>
                 <span className="text-sapphire bg-azure/20 px-2 py-0.5 rounded-full text-xs font-medium">Level {maidData.level}</span>
               </div>
@@ -165,7 +164,7 @@ const MaidDashboard = () => {
         <div className="bg-white rounded-xl shadow-md border border-smoke overflow-hidden">
           <div className="p-4 bg-gradient-to-r from-gold/20 to-gold/5 border-b border-smoke">
             <h3 className="text-xl font-bold text-center flex items-center justify-center gap-2">
-              <CoinIcon className="w-5 h-5 text-gold" />
+              <Coins className="w-5 h-5 text-gold" />
               <span className="text-charcoal">Skoops Rewards</span>
             </h3>
           </div>

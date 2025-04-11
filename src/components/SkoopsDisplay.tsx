@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { CoinIcon } from "lucide-react";
+import { Coins } from "lucide-react";
 
 interface SkoopsDisplayProps {
   skoops: number;
@@ -18,7 +18,7 @@ const SkoopsDisplay = ({ skoops, level, compact = false, className = "" }: Skoop
       transition={{ duration: 0.3 }}
     >
       <div className={`flex items-center bg-gold/20 rounded-full px-${compact ? "2" : "3"} py-1`}>
-        <CoinIcon className="text-gold h-4 w-4 mr-1" />
+        <Coins className="text-gold h-4 w-4 mr-1" />
         <span className={`font-semibold text-gold ${compact ? "text-xs" : "text-sm"}`}>
           {skoops} Skoops
         </span>

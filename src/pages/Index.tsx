@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, CoinIcon } from "lucide-react";
+import { Bell, Coins } from "lucide-react";
 import CustomerBottomNav from "@/components/CustomerBottomNav";
 import HomeLocationHeader from "@/components/HomeLocationHeader";
 import PromoCarousel from "@/components/PromoCarousel";
@@ -104,7 +103,7 @@ const SkoopsBenefits = () => {
   return (
     <div className="bg-gradient-to-r from-gold/20 to-coral/10 rounded-xl p-4 mb-6">
       <h3 className="font-bold text-charcoal flex items-center gap-2 mb-3">
-        <CoinIcon className="text-gold h-5 w-5" />
+        <Coins className="text-gold h-5 w-5" />
         Skoops Benefits
       </h3>
       <div className="space-y-2 text-sm">
