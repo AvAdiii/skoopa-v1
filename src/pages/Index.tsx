@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell } from "lucide-react";
+import { Bell, CoinIcon } from "lucide-react";
 import CustomerBottomNav from "@/components/CustomerBottomNav";
 import HomeLocationHeader from "@/components/HomeLocationHeader";
 import PromoCarousel from "@/components/PromoCarousel";
@@ -12,10 +12,11 @@ import ServiceCategory from "@/components/ServiceCategory";
 import SkoopaLogo from "@/components/SkoopaLogo";
 import UserGreeting from "@/components/UserGreeting";
 import ActiveBooking from "@/components/ActiveBooking";
+import SkoopsDisplay from "@/components/SkoopsDisplay";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 
-// Mock data for services
+// Mock data for services - updating pricing model to Monthly/Yearly
 const REGULAR_SERVICES = [
   {
     icon: (
@@ -27,8 +28,8 @@ const REGULAR_SERVICES = [
     ),
     title: "Regular Cleaning",
     description: "Daily or weekly cleaning of your home including dusting, sweeping, and bathroom cleaning.",
-    price: "249",
-    duration: "1 hour",
+    price: "1,999",
+    duration: "Monthly",
     popular: true,
     id: "regular-cleaning"
   },
@@ -43,8 +44,8 @@ const REGULAR_SERVICES = [
     ),
     title: "Kitchen Cleaning",
     description: "Deep cleaning of kitchen including utensils, stove, countertops and storage.",
-    price: "349",
-    duration: "1.5 hours",
+    price: "2,499",
+    duration: "Monthly",
     popular: false,
     id: "kitchen-cleaning"
   },
@@ -60,8 +61,8 @@ const PREMIUM_SERVICES = [
     ),
     title: "Deep Cleaning",
     description: "Thorough cleaning of your entire home, removing stubborn dirt and stains.",
-    price: "899",
-    duration: "4 hours",
+    price: "19,999",
+    duration: "Yearly",
     popular: true,
     id: "deep-cleaning"
   },
@@ -74,8 +75,8 @@ const PREMIUM_SERVICES = [
     ),
     title: "Diwali Special",
     description: "Complete home cleaning and decoration for the festival of lights.",
-    price: "999",
-    duration: "6 hours",
+    price: "24,999",
+    duration: "Yearly",
     popular: true,
     id: "diwali-special"
   },
@@ -91,12 +92,55 @@ const PREMIUM_SERVICES = [
     ),
     title: "Maid Replacement Guarantee",
     description: "Never worry about your maid's absence with our replacement guarantee.",
-    price: "599",
-    duration: "Monthly",
+    price: "9,999",
+    duration: "Yearly",
     popular: false,
     id: "maid-insurance"
   }
 ];
+
+// Add a Skoops benefits component
+const SkoopsBenefits = () => {
+  return (
+    <div className="bg-gradient-to-r from-gold/20 to-coral/10 rounded-xl p-4 mb-6">
+      <h3 className="font-bold text-charcoal flex items-center gap-2 mb-3">
+        <CoinIcon className="text-gold h-5 w-5" />
+        Skoops Benefits
+      </h3>
+      <div className="space-y-2 text-sm">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-gold"></div>
+          <p className="text-steel">Earn Skoops through low cancellation rates</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-gold"></div>
+          <p className="text-steel">Get positive maid reviews for bonus Skoops</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-gold"></div>
+          <p className="text-steel">Consistent payments earn you loyalty Skoops</p>
+        </div>
+        <div className="bg-white/50 rounded-lg p-3 mt-4">
+          <p className="text-xs text-charcoal font-medium">Higher Skoop levels unlock:</p>
+          <ul className="text-xs mt-2 space-y-1">
+            <li className="flex items-center gap-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-coral"></div>
+              <span>Priority service booking</span>
+            </li>
+            <li className="flex items-center gap-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-coral"></div>
+              <span>Discounts on subscriptions</span>
+            </li>
+            <li className="flex items-center gap-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-coral"></div>
+              <span>Access to premium maids</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface MaidInfo {
   name: string;
@@ -118,8 +162,23 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [userSkoops, setUserSkoops] = useState({ skoops: 0, level: 1 });
   
   useEffect(() => {
+    // Get user skoops data
+    const userData = localStorage.getItem("skoopa-user");
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        setUserSkoops({
+          skoops: user.skoops || 150,
+          level: user.skoop_level || 2
+        });
+      } catch (e) {
+        console.error("Error parsing user data", e);
+      }
+    }
+
     // Check if there's a booking in localStorage
     const storedBookings = localStorage.getItem("skoopa-bookings");
     if (storedBookings) {
@@ -169,13 +228,16 @@ const Index = () => {
       >
         <div className="flex justify-between items-center">
           <SkoopaLogo />
-          <button 
-            onClick={goToNotifications}
-            className="relative p-2 rounded-full hover:bg-smoke/30 transition-colors"
-          >
-            <Bell size={22} className="text-charcoal" />
-            <span className="absolute top-0 right-0 w-2 h-2 bg-coral rounded-full"></span>
-          </button>
+          <div className="flex items-center gap-3">
+            <SkoopsDisplay skoops={userSkoops.skoops} level={userSkoops.level} compact />
+            <button 
+              onClick={goToNotifications}
+              className="relative p-2 rounded-full hover:bg-smoke/30 transition-colors"
+            >
+              <Bell size={22} className="text-charcoal" />
+              <span className="absolute top-0 right-0 w-2 h-2 bg-coral rounded-full"></span>
+            </button>
+          </div>
         </div>
       </motion.div>
 
@@ -187,6 +249,11 @@ const Index = () => {
         
         {/* Greeting */}
         <UserGreeting className="mt-6" />
+
+        {/* Skoops Display */}
+        <div className="mt-4 mb-6">
+          <SkoopsDisplay skoops={userSkoops.skoops} level={userSkoops.level} />
+        </div>
 
         {/* Search */}
         <SearchInput 
@@ -255,13 +322,16 @@ const Index = () => {
             {/* Promo Carousel */}
             <PromoCarousel />
 
+            {/* Skoops Benefits */}
+            <SkoopsBenefits />
+
             {/* Quick Actions */}
             <QuickActions />
 
             {/* Service Categories */}
             <div className="mb-6">
               <h2 className="text-lg font-bold text-sapphire mb-3 flex items-center">
-                <span>Regular Services</span>
+                <span>Monthly Subscriptions</span>
                 <div className="flex-1 h-px bg-smoke ml-3"></div>
               </h2>
               <div className="grid grid-cols-1 gap-3">
@@ -301,7 +371,7 @@ const Index = () => {
             
             <div className="mb-6">
               <h2 className="text-lg font-bold text-sapphire mb-3 flex items-center">
-                <span>Premium Services</span>
+                <span>Yearly Subscriptions</span>
                 <div className="flex-1 h-px bg-smoke ml-3"></div>
               </h2>
               <div className="grid grid-cols-1 gap-3">

@@ -64,15 +64,16 @@ const MaidLogin = () => {
       localStorage.setItem("skoopa-maid", JSON.stringify({
         id: "dummy-maid-id",
         phoneNumber: phoneNumber,
-        isLoggedIn: true
+        isLoggedIn: true,
+        skoops: 230, // Initialize with some Skoops
+        skoop_level: 3, // Initial level
+        rating: 4.8
       }));
       
       toast.success("Login successful!");
       
-      // Navigate to maid dashboard
-      setTimeout(() => {
-        navigate("/maid");
-      }, 500);
+      // Navigate to maid dashboard - removing setTimeout to fix automatic redirection
+      navigate("/maid");
     } catch (error: any) {
       toast.error(error.message || "Login failed");
     } finally {

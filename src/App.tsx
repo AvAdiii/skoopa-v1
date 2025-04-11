@@ -5,12 +5,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { ToastProvider } from "@/hooks/use-toast"; // Import the new ToastProvider
+import { ToastProvider } from "@/hooks/use-toast";
 import Index from "./pages/Index";
 import SplashScreen from "./components/SplashScreen";
 import Login from "./pages/Login";
 import MaidLogin from "./pages/MaidLogin";
 import MaidDashboard from "./pages/maid/MaidDashboard";
+import MaidNotifications from "./pages/maid/MaidNotifications";
 import ServiceBooking from "./pages/ServiceBooking";
 import Bookings from "./pages/Bookings";
 import Chat from "./pages/Chat";
@@ -129,6 +130,7 @@ const App = () => {
               
               {/* Maid interface routes */}
               <Route path="/maid" element={<MaidDashboard />} />
+              <Route path="/maid/notifications" element={<MaidNotifications />} />
               
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />

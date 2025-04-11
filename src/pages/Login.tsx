@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -92,7 +91,9 @@ const Login = () => {
         id: "dummy-user-id",
         email: loginMethod === "email" ? email : DUMMY_EMAIL,
         phoneNumber: loginMethod === "phone" ? phoneNumber : DUMMY_PHONE,
-        isLoggedIn: true
+        isLoggedIn: true,
+        skoops: 150, // Initialize with some Skoops
+        skoop_level: 2, // Initial level
       }));
       
       toast({
@@ -100,10 +101,8 @@ const Login = () => {
         description: "Login successful",
       });
       
-      // Navigate to home page
-      setTimeout(() => {
-        navigate("/");
-      }, 500);
+      // Navigate to home page - removing setTimeout to fix automatic redirection
+      navigate("/");
     } catch (error: any) {
       toast({
         title: "Error",
