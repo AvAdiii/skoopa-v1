@@ -10,7 +10,7 @@ import Notifications from "./pages/Notifications";
 import MaidNotifications from "./pages/maid/MaidNotifications";
 import Settings from "./pages/Settings";
 import Search from "./pages/Search";
-import Service from "./pages/Service";
+import ServiceBooking from "./pages/ServiceBooking";
 
 const queryClient = new QueryClient();
 
@@ -28,7 +28,7 @@ function App() {
             <Route path="/maid/notifications" element={<MaidNotifications />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/search" element={<Search />} />
-            <Route path="/service/:serviceId" element={<Service />} />
+            <Route path="/service/:serviceId" element={<ServiceBooking />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Router>
