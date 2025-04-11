@@ -9,11 +9,8 @@ import UserGreeting from "@/components/UserGreeting";
 import ActiveBooking from "@/components/ActiveBooking";
 import SkoopsDisplay from "@/components/SkoopsDisplay";
 import CustomerBottomNav from "@/components/CustomerBottomNav";
-import SkoopsBenefits from "@/components/SkoopsBenefits";
 import SubscriptionSection from "@/components/SubscriptionSection";
 import AppHeader from "@/components/AppHeader";
-import { cn } from "@/lib/utils";
-import { Bell, Coins } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 // Mock data for services - updating pricing model to Monthly/Yearly
@@ -261,9 +258,6 @@ const Index = () => {
           >
             {/* Promo Carousel */}
             <PromoCarousel />
-
-            {/* Skoops Benefits */}
-            <SkoopsBenefits />
 
             {/* Quick Actions */}
             <QuickActions />

@@ -4,7 +4,6 @@ import { toast } from "@/hooks/use-toast";
 import MaidHeader from "@/components/maid/MaidHeader";
 import MaidProfile from "@/components/maid/MaidProfile";
 import AvailabilityToggle from "@/components/maid/AvailabilityToggle";
-import SkoopsRewards from "@/components/maid/SkoopsRewards";
 import TodaysJobs from "@/components/maid/TodaysJobs";
 import EarningsCard from "@/components/maid/EarningsCard";
 import BottomActions from "@/components/maid/BottomActions";
@@ -86,7 +85,11 @@ const MaidDashboard = () => {
   return (
     <div className="min-h-screen bg-white pb-8">
       {/* Header */}
-      <MaidHeader notificationCount={3} />
+      <MaidHeader 
+        notificationCount={3} 
+        skoops={maidData.skoops} 
+        level={maidData.level}
+      />
 
       {/* Maid Profile Card */}
       <MaidProfile 
@@ -102,9 +105,6 @@ const MaidDashboard = () => {
         initialAvailability={isAvailable} 
         onToggle={handleAvailabilityToggle}
       />
-
-      {/* Skoops Explanation */}
-      <SkoopsRewards skoops={maidData.skoops} />
 
       {/* Today's Jobs */}
       <TodaysJobs jobs={upcomingJobs} />
