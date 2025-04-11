@@ -7,36 +7,34 @@ import { Input } from "@/components/ui/input";
 import { Phone, ChevronRight, ArrowLeft } from "lucide-react";
 import SkoopaLogo from "@/components/SkoopaLogo";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+
+// Dummy credentials for maid login
+const DUMMY_MAID_PHONE = "987654321";
+const DUMMY_MAID_PASSWORD = "maid1234";
 
 const MaidLogin = () => {
   const navigate = useNavigate();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
-  const [otp, setOtp] = useState("");
-  const [showOtp, setShowOtp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Check if user is already logged in
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/maid");
-      }
-    };
-    
-    checkUser();
+    // Check if maid is already logged in
+    const maid = localStorage.getItem("skoopa-maid");
+    if (maid) {
+      navigate("/maid");
+    }
   }, [navigate]);
 
-  const handleContinue = async () => {
+  const handleContinue = () => {
     if (!phoneNumber) {
       toast.error("Please enter your phone number");
       return;
     }
 
-    if (!showOtp) {
-      setShowOtp(true);
+    if (!showPassword) {
+      setShowPassword(true);
       toast.success("Please enter your password");
       return;
     }
@@ -49,18 +47,32 @@ const MaidLogin = () => {
     try {
       setLoading(true);
       
-      // Assume maids use their phone number as email (phone@skoopa.com)
-      const email = `${phoneNumber}@skoopa-maid.com`;
+      // Check dummy maid credentials
+      if (phoneNumber !== DUMMY_MAID_PHONE) {
+        toast.error("Invalid phone number. Try 987654321");
+        setLoading(false);
+        return;
+      }
       
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
+      if (password !== DUMMY_MAID_PASSWORD) {
+        toast.error("Invalid password. Try maid1234");
+        setLoading(false);
+        return;
+      }
+      
+      // Store maid info in localStorage
+      localStorage.setItem("skoopa-maid", JSON.stringify({
+        id: "dummy-maid-id",
+        phoneNumber: phoneNumber,
+        isLoggedIn: true
+      }));
       
       toast.success("Login successful!");
-      navigate("/maid");
+      
+      // Navigate to maid dashboard
+      setTimeout(() => {
+        navigate("/maid");
+      }, 500);
     } catch (error: any) {
       toast.error(error.message || "Login failed");
     } finally {
@@ -101,7 +113,7 @@ const MaidLogin = () => {
         
         {/* Input fields */}
         <div className="space-y-4">
-          {!showOtp ? (
+          {!showPassword ? (
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel w-5 h-5" />
               <span className="absolute left-10 top-1/2 transform -translate-y-1/2 text-steel">+91</span>
@@ -129,13 +141,13 @@ const MaidLogin = () => {
               <div className="flex justify-between items-center">
                 <button 
                   className="text-coral text-sm font-medium"
-                  onClick={() => setShowOtp(false)}
+                  onClick={() => setShowPassword(false)}
                 >
                   Change phone number
                 </button>
                 <button 
                   className="text-coral text-sm font-medium"
-                  onClick={() => toast.info("Please contact admin to reset password")}
+                  onClick={() => toast.info("Demo password: maid1234")}
                 >
                   Forgot password?
                 </button>
@@ -148,9 +160,15 @@ const MaidLogin = () => {
             onClick={handleContinue}
             disabled={loading}
           >
-            {loading ? "Please wait..." : showOtp ? "Login" : "Continue"} 
+            {loading ? "Please wait..." : showPassword ? "Login" : "Continue"} 
             <ChevronRight size={18} />
           </Button>
+          
+          {!showPassword && (
+            <p className="text-sm text-center text-steel mt-2">
+              Demo phone: 987654321
+            </p>
+          )}
         </div>
         
         {/* Terms and conditions */}

@@ -101,7 +101,9 @@ const Login = () => {
       });
       
       // Navigate to home page
-      navigate("/");
+      setTimeout(() => {
+        navigate("/");
+      }, 500);
     } catch (error: any) {
       toast({
         title: "Error",
