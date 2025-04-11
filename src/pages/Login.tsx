@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -6,7 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Phone, Mail, ChevronRight } from "lucide-react";
 import SkoopaLogo from "@/components/SkoopaLogo";
 import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+
+// Dummy credentials for login
+const DUMMY_PHONE = "123456789";
+const DUMMY_PASSWORD = "abcd1234";
+const DUMMY_EMAIL = "test@example.com";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -30,203 +35,73 @@ const Login = () => {
 
   useEffect(() => {
     // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate("/");
-      }
-    });
-
-    // Set up auth state listener
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        // Store user info in localStorage for easy access
-        localStorage.setItem("skoopa-user", JSON.stringify({
-          id: session.user.id,
-          email: session.user.email,
-          phoneNumber: session.user.phone,
-          isLoggedIn: true
-        }));
-        navigate("/");
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    const user = localStorage.getItem("skoopa-user");
+    if (user) {
+      navigate("/");
+    }
   }, [navigate]);
 
-  const handleSignInWithEmail = async () => {
+  const handleDummyLogin = () => {
     try {
       setLoading(true);
       
-      if (!email) {
-        toast({
-          title: "Error",
-          description: "Please enter your email",
-          variant: "destructive"
-        });
-        return;
+      if (loginMethod === "phone") {
+        if (phoneNumber !== DUMMY_PHONE) {
+          toast({
+            title: "Error",
+            description: "Invalid phone number. Try 123456789",
+            variant: "destructive"
+          });
+          setLoading(false);
+          return;
+        }
+        
+        if (!password || password !== DUMMY_PASSWORD) {
+          toast({
+            title: "Error",
+            description: "Invalid password. Try abcd1234",
+            variant: "destructive"
+          });
+          setLoading(false);
+          return;
+        }
+      } else { // email login
+        if (email !== DUMMY_EMAIL) {
+          toast({
+            title: "Error",
+            description: "Invalid email. Try test@example.com",
+            variant: "destructive"
+          });
+          setLoading(false);
+          return;
+        }
+        
+        if (!password || password !== DUMMY_PASSWORD) {
+          toast({
+            title: "Error",
+            description: "Invalid password. Try abcd1234",
+            variant: "destructive"
+          });
+          setLoading(false);
+          return;
+        }
       }
       
-      if (!password) {
-        toast({
-          title: "Error",
-          description: "Please enter your password",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
+      // Store dummy user info in localStorage
+      localStorage.setItem("skoopa-user", JSON.stringify({
+        id: "dummy-user-id",
+        email: loginMethod === "email" ? email : DUMMY_EMAIL,
+        phoneNumber: loginMethod === "phone" ? phoneNumber : DUMMY_PHONE,
+        isLoggedIn: true
+      }));
       
       toast({
         title: "Success",
         description: "Login successful",
       });
-      // Auth state change listener will handle redirect
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Error signing in",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignUpWithEmail = async () => {
-    try {
-      setLoading(true);
       
-      if (!email) {
-        toast({
-          title: "Error",
-          description: "Please enter your email",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      if (!password) {
-        toast({
-          title: "Error",
-          description: "Please enter your password",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            first_name: "",
-            last_name: "",
-            phone_number: phoneNumber
-          }
-        }
-      });
-
-      if (error) throw error;
-      
-      toast({
-        title: "Success",
-        description: "Sign up successful! Please check your email for verification.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Error signing up",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePhoneLogin = async () => {
-    try {
-      setLoading(true);
-      
-      if (!phoneNumber || phoneNumber.length !== 10) {
-        toast({
-          title: "Error",
-          description: "Please enter a valid 10-digit phone number",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      if (!password && showPassword) {
-        toast({
-          title: "Error",
-          description: "Please enter your password",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      // For phone authentication, create a unique email based on phone number
-      const phoneEmail = `+91${phoneNumber}@skoopa.com`;
-      
-      // Check if user exists
-      const { data, error: checkError } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('phone_number', `+91${phoneNumber}`)
-        .maybeSingle();
-      
-      if (checkError) throw checkError;
-      
-      if (!data && !showPassword) {
-        // Show password field for registration
-        setShowPassword(true);
-        setLoading(false);
-        return;
-      }
-      
-      if (!data && showPassword) {
-        // Register new user
-        const { error } = await supabase.auth.signUp({
-          email: phoneEmail,
-          password: password,
-          options: {
-            data: {
-              phone_number: `+91${phoneNumber}`
-            }
-          }
-        });
-        
-        if (error) throw error;
-        
-        toast({
-          title: "Success",
-          description: "Account created successfully!",
-        });
-      } else if (data && showPassword) {
-        // Sign in existing user
-        const { error } = await supabase.auth.signInWithPassword({
-          email: phoneEmail,
-          password: password,
-        });
-        
-        if (error) throw error;
-        
-        toast({
-          title: "Success",
-          description: "Login successful",
-        });
-      } else {
-        // Existing user, show password field
-        setShowPassword(true);
-      }
+      // Navigate to home page
+      navigate("/");
     } catch (error: any) {
       toast({
         title: "Error",
@@ -239,14 +114,10 @@ const Login = () => {
   };
 
   const handleContinue = () => {
-    if (loginMethod === "phone") {
-      handlePhoneLogin();
-    } else { // email login
-      if (!showPassword) {
-        setShowPassword(true);
-      } else {
-        handleSignInWithEmail();
-      }
+    if (!showPassword) {
+      setShowPassword(true);
+    } else {
+      handleDummyLogin();
     }
   };
 
@@ -421,14 +292,9 @@ const Login = () => {
                 >
                   Change {loginMethod}
                 </button>
-                {loginMethod === "email" && (
-                  <button 
-                    className="text-coral text-sm font-medium"
-                    onClick={() => handleSignUpWithEmail()}
-                  >
-                    Sign Up Instead
-                  </button>
-                )}
+                <div className="text-steel text-sm">
+                  Demo password: abcd1234
+                </div>
               </div>
             </motion.div>
           )}
@@ -443,10 +309,26 @@ const Login = () => {
               onClick={handleContinue}
               disabled={loading}
             >
-              {loading ? "Please wait..." : showPassword ? (loginMethod === "email" ? "Login" : "Login/Sign Up") : "Continue"} 
+              {loading ? "Please wait..." : showPassword ? "Login" : "Continue"} 
               <ChevronRight size={18} />
             </Button>
           </motion.div>
+          
+          {/* Demo credentials */}
+          {!showPassword && (
+            <motion.div 
+              className="text-sm text-center text-steel mt-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              {loginMethod === "phone" ? (
+                <span>Demo phone: 123456789</span>
+              ) : (
+                <span>Demo email: test@example.com</span>
+              )}
+            </motion.div>
+          )}
         </motion.div>
         
         {/* Indian-inspired decoration */}
