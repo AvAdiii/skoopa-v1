@@ -1,18 +1,19 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Coins } from "lucide-react";
-import CustomerBottomNav from "@/components/CustomerBottomNav";
 import HomeLocationHeader from "@/components/HomeLocationHeader";
 import PromoCarousel from "@/components/PromoCarousel";
 import QuickActions from "@/components/QuickActions";
 import SearchInput from "@/components/SearchInput";
-import ServiceCategory from "@/components/ServiceCategory";
-import SkoopaLogo from "@/components/SkoopaLogo";
 import UserGreeting from "@/components/UserGreeting";
 import ActiveBooking from "@/components/ActiveBooking";
 import SkoopsDisplay from "@/components/SkoopsDisplay";
+import CustomerBottomNav from "@/components/CustomerBottomNav";
+import SkoopsBenefits from "@/components/SkoopsBenefits";
+import SubscriptionSection from "@/components/SubscriptionSection";
+import AppHeader from "@/components/AppHeader";
 import { cn } from "@/lib/utils";
+import { Bell, Coins } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 // Mock data for services - updating pricing model to Monthly/Yearly
@@ -98,49 +99,6 @@ const PREMIUM_SERVICES = [
   }
 ];
 
-// Add a Skoops benefits component
-const SkoopsBenefits = () => {
-  return (
-    <div className="bg-gradient-to-r from-gold/20 to-coral/10 rounded-xl p-4 mb-6">
-      <h3 className="font-bold text-charcoal flex items-center gap-2 mb-3">
-        <Coins className="text-gold h-5 w-5" />
-        Skoops Benefits
-      </h3>
-      <div className="space-y-2 text-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-gold"></div>
-          <p className="text-steel">Earn Skoops through low cancellation rates</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-gold"></div>
-          <p className="text-steel">Get positive maid reviews for bonus Skoops</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-gold"></div>
-          <p className="text-steel">Consistent payments earn you loyalty Skoops</p>
-        </div>
-        <div className="bg-white/50 rounded-lg p-3 mt-4">
-          <p className="text-xs text-charcoal font-medium">Higher Skoop levels unlock:</p>
-          <ul className="text-xs mt-2 space-y-1">
-            <li className="flex items-center gap-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-coral"></div>
-              <span>Priority service booking</span>
-            </li>
-            <li className="flex items-center gap-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-coral"></div>
-              <span>Discounts on subscriptions</span>
-            </li>
-            <li className="flex items-center gap-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-coral"></div>
-              <span>Access to premium maids</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 interface MaidInfo {
   name: string;
   rating: number;
@@ -207,38 +165,21 @@ const Index = () => {
   const handleServiceClick = (serviceId: string) => {
     navigate(`/service/${serviceId}`);
   };
-  
-  const goToNotifications = () => {
-    navigate('/notifications');
-  };
 
   const handleClearSearch = () => {
     setIsSearching(false);
     setSearchQuery("");
   };
   
+  const goToNotifications = () => {
+    navigate('/notifications');
+  };
+
+  
   return (
     <div className="pb-20">
       {/* Header with Logo */}
-      <motion.div 
-        className="sticky top-0 z-40 bg-white py-3 px-4 border-b border-smoke"
-        initial={{ y: 0 }}
-        animate={{ y: 0 }}
-      >
-        <div className="flex justify-between items-center">
-          <SkoopaLogo />
-          <div className="flex items-center gap-3">
-            <SkoopsDisplay skoops={userSkoops.skoops} level={userSkoops.level} compact />
-            <button 
-              onClick={goToNotifications}
-              className="relative p-2 rounded-full hover:bg-smoke/30 transition-colors"
-            >
-              <Bell size={22} className="text-charcoal" />
-              <span className="absolute top-0 right-0 w-2 h-2 bg-coral rounded-full"></span>
-            </button>
-          </div>
-        </div>
-      </motion.div>
+      <AppHeader skoops={userSkoops.skoops} level={userSkoops.level} />
 
       <div className="px-4 py-3">
         {/* Location Header - Now clickable */}
@@ -327,86 +268,18 @@ const Index = () => {
             {/* Quick Actions */}
             <QuickActions />
 
-            {/* Service Categories */}
-            <div className="mb-6">
-              <h2 className="text-lg font-bold text-sapphire mb-3 flex items-center">
-                <span>Monthly Subscriptions</span>
-                <div className="flex-1 h-px bg-smoke ml-3"></div>
-              </h2>
-              <div className="grid grid-cols-1 gap-3">
-                {REGULAR_SERVICES.map((service, index) => (
-                  <div 
-                    key={index}
-                    className={cn(
-                      "relative p-4 bg-white rounded-xl border border-smoke shadow-sm cursor-pointer hover:border-coral transition-colors",
-                      service.popular && "border-l-4 border-l-gold"
-                    )}
-                    onClick={() => handleServiceClick(service.id)}
-                  >
-                    {service.popular && (
-                      <span className="absolute -top-2 -right-1 bg-gold text-sapphire text-xs font-bold px-2 py-0.5 rounded-full">
-                        Popular
-                      </span>
-                    )}
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-10 h-10 bg-azure rounded-full flex items-center justify-center text-sapphire">
-                        {service.icon}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-bold text-charcoal">{service.title}</h3>
-                        <p className="text-sm text-steel line-clamp-2 mt-1">{service.description}</p>
-                        <div className="flex justify-between items-center mt-2">
-                          <span className="font-bold text-coral">₹{service.price}</span>
-                          <div className="flex items-center text-xs text-steel">
-                            <span>{service.duration}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Subscription Sections */}
+            <SubscriptionSection 
+              title="Monthly Subscriptions" 
+              services={REGULAR_SERVICES} 
+              onServiceClick={handleServiceClick} 
+            />
             
-            <div className="mb-6">
-              <h2 className="text-lg font-bold text-sapphire mb-3 flex items-center">
-                <span>Yearly Subscriptions</span>
-                <div className="flex-1 h-px bg-smoke ml-3"></div>
-              </h2>
-              <div className="grid grid-cols-1 gap-3">
-                {PREMIUM_SERVICES.map((service, index) => (
-                  <div 
-                    key={index}
-                    className={cn(
-                      "relative p-4 bg-white rounded-xl border border-smoke shadow-sm cursor-pointer hover:border-coral transition-colors",
-                      service.popular && "border-l-4 border-l-gold"
-                    )}
-                    onClick={() => handleServiceClick(service.id)}
-                  >
-                    {service.popular && (
-                      <span className="absolute -top-2 -right-1 bg-gold text-sapphire text-xs font-bold px-2 py-0.5 rounded-full">
-                        Popular
-                      </span>
-                    )}
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-10 h-10 bg-azure rounded-full flex items-center justify-center text-sapphire">
-                        {service.icon}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-bold text-charcoal">{service.title}</h3>
-                        <p className="text-sm text-steel line-clamp-2 mt-1">{service.description}</p>
-                        <div className="flex justify-between items-center mt-2">
-                          <span className="font-bold text-coral">₹{service.price}</span>
-                          <div className="flex items-center text-xs text-steel">
-                            <span>{service.duration}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <SubscriptionSection 
+              title="Yearly Subscriptions" 
+              services={PREMIUM_SERVICES} 
+              onServiceClick={handleServiceClick} 
+            />
           </motion.div>
         )}
       </div>
