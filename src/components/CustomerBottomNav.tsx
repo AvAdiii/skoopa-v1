@@ -1,69 +1,74 @@
 
-import { Home, User, Calendar, CreditCard, MessageSquare } from "lucide-react";
+import { Home, CalendarCheck, CreditCard, MessageSquare, UserCircle } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 
 const CustomerBottomNav = () => {
   const location = useLocation();
-  const isActive = (path: string) => location.pathname === path;
-
+  const currentPath = location.pathname;
+  
   const navItems = [
-    { icon: Home, label: "Home", path: "/" },
-    { icon: CreditCard, label: "Payments", path: "/payments" },
-    { icon: Calendar, label: "Bookings", path: "/bookings" },
-    { icon: MessageSquare, label: "Chat", path: "/chat" },
-    { icon: User, label: "Profile", path: "/profile" },
+    {
+      label: "Home",
+      icon: Home,
+      href: "/home",  // Updated to use the specific home route
+      active: currentPath === "/home" || currentPath === "/"
+    },
+    {
+      label: "Bookings",
+      icon: CalendarCheck,
+      href: "/bookings",
+      active: currentPath.includes("/bookings") || 
+             currentPath.includes("/track-booking") ||
+             currentPath.includes("/reschedule-booking") ||
+             currentPath.includes("/review-booking")
+    },
+    {
+      label: "Payments",
+      icon: CreditCard,
+      href: "/payments",
+      active: currentPath.includes("/payments") || currentPath.includes("/add-payment-method")
+    },
+    {
+      label: "Chat",
+      icon: MessageSquare,
+      href: "/chat",
+      active: currentPath.includes("/chat")
+    },
+    {
+      label: "Profile",
+      icon: UserCircle,
+      href: "/profile",
+      active: currentPath.includes("/profile") || 
+             currentPath.includes("/settings") ||
+             currentPath.includes("/my-addresses") ||
+             currentPath.includes("/favorite-maids") ||
+             currentPath.includes("/help-support") ||
+             currentPath.includes("/about")
+    }
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-smoke z-50 shadow-lg">
-      <div className="flex justify-between items-center px-2">
-        {navItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-smoke flex items-center justify-between px-2 pb-1 pt-1">
+      {navItems.map((item, index) => (
+        <Link 
+          key={index} 
+          to={item.href}
+          className={cn(
+            "flex flex-col items-center justify-center p-2 min-w-[64px] rounded-lg transition-colors",
+            item.active ? "text-coral" : "text-steel"
+          )}
+        >
+          <item.icon 
             className={cn(
-              "flex flex-col items-center py-2 px-3 transition-colors relative",
-              isActive(item.path)
-                ? "text-coral font-medium"
-                : "text-steel"
-            )}
-          >
-            {isActive(item.path) && (
-              <motion.div
-                layoutId="navIndicator"
-                className="absolute -top-1 w-1.5 h-1.5 rounded-full bg-coral"
-                transition={{ type: "spring", duration: 0.5 }}
-              />
-            )}
-            <motion.div
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ y: -2 }}
-              transition={{ duration: 0.2 }}
-            >
-              <item.icon
-                size={24}
-                className={cn(
-                  "transition-transform", 
-                  isActive(item.path) ? "text-coral scale-110" : "text-steel"
-                )}
-              />
-            </motion.div>
-            <span className="text-xs mt-1">{item.label}</span>
-          </Link>
-        ))}
-      </div>
-
-      {/* Bottom nav background decoration - inspired by Indian patterns */}
-      <div className="absolute -top-1 left-0 right-0 h-1 overflow-hidden">
-        <div className="flex justify-evenly">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="w-5 h-2 bg-coral rounded-b-full opacity-40"></div>
-          ))}
-        </div>
-      </div>
-    </nav>
+              "w-6 h-6",
+              item.active ? "text-coral" : "text-steel"
+            )} 
+          />
+          <span className="text-xs mt-1">{item.label}</span>
+        </Link>
+      ))}
+    </div>
   );
 };
 

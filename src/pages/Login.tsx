@@ -40,7 +40,7 @@ const Login = () => {
       try {
         const userData = JSON.parse(user);
         if (userData.isLoggedIn) {
-          navigate("/");
+          navigate("/home");  // Redirect to the specific home page
         }
       } catch (e) {
         console.error("Error parsing user data", e);
@@ -114,8 +114,8 @@ const Login = () => {
       // First update the state then navigate
       setLoading(false);
       
-      // Navigate to home page immediately 
-      navigate("/");
+      // Navigate to specific home page route immediately 
+      navigate("/home");
       
     } catch (error: any) {
       toast({

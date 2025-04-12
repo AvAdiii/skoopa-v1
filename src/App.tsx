@@ -28,14 +28,8 @@ import RescheduleBooking from "./pages/RescheduleBooking";
 import TrackBooking from "./pages/TrackBooking";
 import ReviewBooking from "./pages/ReviewBooking";
 import PremiumMaids from "./pages/PremiumMaids";
-import AboutSkoopa from "./pages/AboutSkoopa";
-import MyAddresses from "./pages/MyAddresses";
-import FavoriteMaids from "./pages/FavoriteMaids";
-import HelpSupport from "./pages/HelpSupport";
-import DeepCleaning from "./pages/services/DeepCleaning";
-import DiwaliSpecial from "./pages/services/DiwaliSpecial";
-import MaidInsurance from "./pages/services/MaidInsurance";
-import KitchenCleaning from "./pages/services/KitchenCleaning";
+import { MyAddresses, FavoriteMaids, HelpSupport, AboutSkoopa } from "./pages/PlaceholderPages";
+import { DeepCleaning, DiwaliSpecial, MaidInsurance, KitchenCleaning } from "./pages/services";
 
 const queryClient = new QueryClient();
 
@@ -82,11 +76,12 @@ const App = () => {
           <BrowserRouter>
             <Routes>
               {/* Auth routes */}
-              <Route path="/login" element={isLoggedIn ? <Navigate to="/" /> : <Login />} />
+              <Route path="/login" element={isLoggedIn ? <Navigate to="/home" /> : <Login />} />
               <Route path="/maid-login" element={<MaidLogin />} />
               
               {/* Protected customer routes */}
-              <Route path="/" element={isLoggedIn ? <Index /> : <Navigate to="/login" />} />
+              <Route path="/" element={isLoggedIn ? <Navigate to="/home" /> : <Navigate to="/login" />} />
+              <Route path="/home" element={isLoggedIn ? <Index /> : <Navigate to="/login" />} />
               <Route path="/bookings" element={isLoggedIn ? <Bookings /> : <Navigate to="/login" />} />
               <Route path="/payments" element={isLoggedIn ? <Payments /> : <Navigate to="/login" />} />
               <Route path="/chat" element={isLoggedIn ? <Chat /> : <Navigate to="/login" />} />
