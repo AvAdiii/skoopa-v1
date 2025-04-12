@@ -1,5 +1,6 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster, ToastProvider } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Index from "./pages/Index";
@@ -18,21 +19,23 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/maid" element={<MaidDashboard />} />
-            <Route path="/maid-login" element={<MaidLogin />} />
-            <Route path="/edit-location" element={<EditLocation />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/maid/notifications" element={<MaidNotifications />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/service/:serviceId" element={<ServiceBooking />} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </Router>
-        <Toaster />
+        <ToastProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/maid" element={<MaidDashboard />} />
+              <Route path="/maid-login" element={<MaidLogin />} />
+              <Route path="/edit-location" element={<EditLocation />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/maid/notifications" element={<MaidNotifications />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="/service/:serviceId" element={<ServiceBooking />} />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </Router>
+          <Toaster />
+        </ToastProvider>
       </LanguageProvider>
     </QueryClientProvider>
   );
