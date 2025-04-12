@@ -1,7 +1,6 @@
 
 import { motion } from "framer-motion";
 import { Coins } from "lucide-react";
-import SkoopsBenefitsPopover from "./SkoopsBenefitsPopover";
 
 interface SkoopsDisplayProps {
   skoops: number;
@@ -18,12 +17,12 @@ const SkoopsDisplay = ({ skoops, level, compact = false, className = "" }: Skoop
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <SkoopsBenefitsPopover 
-        skoops={skoops} 
-        level={level} 
-        compact={compact} 
-        variant="user"
-      />
+      <div className={`flex items-center bg-gold/20 rounded-full px-${compact ? "2" : "3"} py-1`}>
+        <Coins className="text-gold h-4 w-4 mr-1" />
+        <span className={`font-semibold text-gold ${compact ? "text-xs" : "text-sm"}`}>
+          {skoops} Skoops
+        </span>
+      </div>
       
       {!compact && (
         <div className="bg-azure/20 rounded-full px-3 py-1">

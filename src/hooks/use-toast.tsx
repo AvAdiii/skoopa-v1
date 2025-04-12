@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -131,16 +132,19 @@ export const reducer = (state: State, action: Action): State => {
   }
 }
 
-// Create a Context for toast state
+// Create a context to hold the toast state
 const ToastContext = React.createContext<{
   toasts: ToasterToast[];
   toast: (props: Omit<ToasterToast, "id">) => { id: string; dismiss: () => void; update: (props: ToasterToast) => void };
   dismiss: (toastId?: string) => void;
 } | undefined>(undefined);
 
+// Initial state
+const initialState: State = { toasts: [] };
+
 // Create a provider component
 export function ToastProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = React.useReducer(reducer, { toasts: [] });
+  const [state, dispatch] = React.useReducer(reducer, initialState);
   
   // Set the dispatch function to our module-scope variable
   React.useEffect(() => {
@@ -201,14 +205,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 export function useToast() {
   const context = React.useContext(ToastContext);
   
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useToast must be used within a ToastProvider");
   }
   
   return context;
 }
 
-// For compatibility with non-React contexts
+// For backwards compatibility
 export const toast = (props: Omit<ToasterToast, "id">) => {
   if (typeof window === "undefined") {
     // Return dummy functions when running on server
@@ -219,14 +223,16 @@ export const toast = (props: Omit<ToasterToast, "id">) => {
     };
   }
   
-  // Since we can't directly use the hook outside of components,
-  // we'll have to find another way to access the toast function
-  console.warn("toast() was called outside React component context. This is not recommended.");
-  
-  // Return dummy functions as fallback
-  return {
-    id: "global-toast",
-    dismiss: () => {},
-    update: () => {},
-  };
+  // We need to ensure this is only called in a component context
+  try {
+    return useToast().toast(props);
+  } catch (e) {
+    console.error("Toast was called outside of a valid React component tree", e);
+    // Return dummy functions as fallback
+    return {
+      id: "error-toast",
+      dismiss: () => {},
+      update: () => {},
+    };
+  }
 };

@@ -1,21 +1,19 @@
 
-import * as React from "react"
+import { useToast } from "@/hooks/use-toast"
 import {
   Toast,
   ToastClose,
   ToastDescription,
-  ToastProvider as RadixToastProvider,
+  ToastProvider,
   ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast"
-import { useToast, ToastProvider } from "@/hooks/use-toast"
 
-// Wrap the actual Toaster component with the ToastProvider
-const Toaster = () => {
+export function Toaster() {
   const { toasts } = useToast()
 
   return (
-    <RadixToastProvider>
+    <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
           <Toast key={id} {...props}>
@@ -31,9 +29,6 @@ const Toaster = () => {
         )
       })}
       <ToastViewport />
-    </RadixToastProvider>
+    </ToastProvider>
   )
 }
-
-// Export both the Toaster and ToastProvider
-export { Toaster, ToastProvider }
