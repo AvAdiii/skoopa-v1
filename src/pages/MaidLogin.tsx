@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Phone, ChevronRight, ArrowLeft } from "lucide-react";
 import SkoopaLogo from "@/components/SkoopaLogo";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Dummy credentials for maid login
 const DUMMY_MAID_PHONE = "987654321";
@@ -14,10 +15,54 @@ const DUMMY_MAID_PASSWORD = "maid1234";
 
 const MaidLogin = () => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const translations = {
+    en: {
+      maidLogin: "Maid Login",
+      loginSubtext: "Login to start receiving cleaning jobs",
+      phoneNumber: "Phone number",
+      password: "Password",
+      changePhone: "Change phone number",
+      forgotPassword: "Forgot password?",
+      continue: "Continue",
+      login: "Login",
+      demoPhone: "Demo phone: 987654321",
+      demoPassword: "Demo password: maid1234",
+      enterPassword: "Enter password for +91",
+      terms: "By continuing, you agree to our",
+      termsLink: "Terms of Service",
+      privacy: "Privacy Policy",
+      needHelp: "Need help? Contact",
+      supportEmail: "support@skoopa.com",
+      loginSuccess: "Login successful!"
+    },
+    te: {
+      maidLogin: "మెయిడ్ లాగిన్",
+      loginSubtext: "క్లీనింగ్ జాబ్‌లు స్వీకరించడం ప్రారంభించడానికి లాగిన్ చేయండి",
+      phoneNumber: "ఫోన్ నంబర్",
+      password: "పాస్‌వర్డ్",
+      changePhone: "ఫోన్ నంబర్‌ను మార్చండి",
+      forgotPassword: "పాస్‌వర్డ్ మర్చిపోయారా?",
+      continue: "కొనసాగించండి",
+      login: "లాగిన్",
+      demoPhone: "డెమో ఫోన్: 987654321",
+      demoPassword: "డెమో పాస్‌వర్డ్: maid1234",
+      enterPassword: "+91 కోసం పాస్‌వర్డ్‌ని నమోదు చేయండి",
+      terms: "కొనసాగించడం ద్వారా, మీరు మా",
+      termsLink: "సేవా నియమాలు",
+      privacy: "గోప్యతా విధానం",
+      needHelp: "సహాయం కావాలా? సంప్రదించండి",
+      supportEmail: "support@skoopa.com",
+      loginSuccess: "లాగిన్ విజయవంతమైంది!"
+    }
+  };
+
+  const t = translations[language];
 
   useEffect(() => {
     // Check if maid is already logged in
@@ -29,18 +74,25 @@ const MaidLogin = () => {
 
   const handleContinue = () => {
     if (!phoneNumber) {
-      toast.error("Please enter your phone number");
+      toast({
+        title: "Error",
+        description: "Please enter your phone number",
+        variant: "destructive"
+      });
       return;
     }
 
     if (!showPassword) {
       setShowPassword(true);
-      toast.success("Please enter your password");
       return;
     }
 
     if (!password) {
-      toast.error("Please enter the password");
+      toast({
+        title: "Error",
+        description: "Please enter the password",
+        variant: "destructive"
+      });
       return;
     }
 
@@ -49,13 +101,21 @@ const MaidLogin = () => {
       
       // Check dummy maid credentials
       if (phoneNumber !== DUMMY_MAID_PHONE) {
-        toast.error("Invalid phone number. Try 987654321");
+        toast({
+          title: "Error",
+          description: "Invalid phone number. Try 987654321",
+          variant: "destructive"
+        });
         setLoading(false);
         return;
       }
       
       if (password !== DUMMY_MAID_PASSWORD) {
-        toast.error("Invalid password. Try maid1234");
+        toast({
+          title: "Error",
+          description: "Invalid password. Try maid1234",
+          variant: "destructive"
+        });
         setLoading(false);
         return;
       }
@@ -67,16 +127,23 @@ const MaidLogin = () => {
         isLoggedIn: true,
         skoops: 230, // Initialize with some Skoops
         skoop_level: 3, // Initial level
-        rating: 4.8
+        rating: 4.8,
+        name: "Lakshmi Devi"
       }));
       
-      toast.success("Login successful!");
+      toast({
+        title: t.loginSuccess,
+        description: new Date().toLocaleTimeString(),
+      });
       
-      // Navigate to maid dashboard - removing setTimeout to fix automatic redirection
+      // Navigate immediately without timeout
       navigate("/maid");
     } catch (error: any) {
-      toast.error(error.message || "Login failed");
-    } finally {
+      toast({
+        title: "Error",
+        description: error.message || "Login failed",
+        variant: "destructive"
+      });
       setLoading(false);
     }
   };
@@ -109,8 +176,8 @@ const MaidLogin = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        <h1 className="text-2xl font-bold text-sapphire mb-1">Maid Login</h1>
-        <p className="text-steel mb-6">Login to start receiving cleaning jobs</p>
+        <h1 className="text-2xl font-bold text-sapphire mb-1">{t.maidLogin}</h1>
+        <p className="text-steel mb-6">{t.loginSubtext}</p>
         
         {/* Input fields */}
         <div className="space-y-4">
@@ -120,7 +187,7 @@ const MaidLogin = () => {
               <span className="absolute left-10 top-1/2 transform -translate-y-1/2 text-steel">+91</span>
               <Input 
                 type="tel" 
-                placeholder="Phone number" 
+                placeholder={t.phoneNumber}
                 className="pl-24"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
@@ -130,11 +197,11 @@ const MaidLogin = () => {
           ) : (
             <div className="space-y-3">
               <p className="text-sm text-charcoal">
-                Enter password for +91 {phoneNumber}
+                {t.enterPassword} {phoneNumber}
               </p>
               <Input 
                 type="password" 
-                placeholder="Password" 
+                placeholder={t.password}
                 className="w-full"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -144,13 +211,15 @@ const MaidLogin = () => {
                   className="text-coral text-sm font-medium"
                   onClick={() => setShowPassword(false)}
                 >
-                  Change phone number
+                  {t.changePhone}
                 </button>
                 <button 
                   className="text-coral text-sm font-medium"
-                  onClick={() => toast.info("Demo password: maid1234")}
+                  onClick={() => toast({
+                    title: t.demoPassword,
+                  })}
                 >
-                  Forgot password?
+                  {t.forgotPassword}
                 </button>
               </div>
             </div>
@@ -161,26 +230,26 @@ const MaidLogin = () => {
             onClick={handleContinue}
             disabled={loading}
           >
-            {loading ? "Please wait..." : showPassword ? "Login" : "Continue"} 
+            {loading ? "Please wait..." : showPassword ? t.login : t.continue} 
             <ChevronRight size={18} />
           </Button>
           
           {!showPassword && (
             <p className="text-sm text-center text-steel mt-2">
-              Demo phone: 987654321
+              {t.demoPhone}
             </p>
           )}
         </div>
         
         {/* Terms and conditions */}
         <p className="text-xs text-steel text-center mt-6">
-          By continuing, you agree to our <span className="text-coral">Terms of Service</span> and <span className="text-coral">Privacy Policy</span>
+          {t.terms} <span className="text-coral">{t.termsLink}</span> {t.privacy}
         </p>
       </motion.div>
       
       {/* Help text */}
       <div className="mt-auto text-center pt-6">
-        <p className="text-sm text-steel">Need help? Contact <span className="text-coral">support@skoopa.com</span></p>
+        <p className="text-sm text-steel">{t.needHelp} <span className="text-coral">{t.supportEmail}</span></p>
       </div>
     </motion.div>
   );
