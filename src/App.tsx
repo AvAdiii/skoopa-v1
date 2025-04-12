@@ -29,33 +29,7 @@ import TrackBooking from "./pages/TrackBooking";
 import ReviewBooking from "./pages/ReviewBooking";
 import PremiumMaids from "./pages/PremiumMaids";
 import { MyAddresses, FavoriteMaids, HelpSupport, AboutSkoopa } from "./pages/PlaceholderPages";
-import { DeepCleaning, DiwaliSpecial, MaidInsurance } from "./pages/services";
-
-// Create a netlify.toml file to handle SPA routing
-const netlifyConfig = `
-[build]
-  publish = "dist"
-  command = "npm run build"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-`;
-
-// Create the netlify.toml file
-try {
-  if (typeof window !== 'undefined') {
-    // This code only runs in the browser
-    const fs = window.require && window.require('fs');
-    if (fs) {
-      fs.writeFileSync('netlify.toml', netlifyConfig);
-    }
-  }
-} catch (e) {
-  // Ignore errors, this is just a helper for Netlify deployment
-  console.log('Could not create netlify.toml file. This is expected in the browser.');
-}
+import { DeepCleaning, DiwaliSpecial, MaidInsurance, KitchenCleaning } from "./pages/services";
 
 const queryClient = new QueryClient();
 
@@ -130,6 +104,7 @@ const App = () => {
               <Route path="/service/deep-cleaning" element={isLoggedIn ? <DeepCleaning /> : <Navigate to="/login" />} />
               <Route path="/service/diwali-special" element={isLoggedIn ? <DiwaliSpecial /> : <Navigate to="/login" />} />
               <Route path="/service/maid-insurance" element={isLoggedIn ? <MaidInsurance /> : <Navigate to="/login" />} />
+              <Route path="/service/kitchen-cleaning" element={isLoggedIn ? <KitchenCleaning /> : <Navigate to="/login" />} />
               
               {/* Maid interface routes */}
               <Route path="/maid" element={<MaidDashboard />} />
