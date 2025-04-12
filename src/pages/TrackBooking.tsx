@@ -36,7 +36,7 @@ const TrackBooking = () => {
   
   // Maid information (mock data)
   const maid = {
-    name: "Lakshmi Devi",
+    name: "Nandini Chakaravarthy",
     phone: "+91 98765 12345",
     rating: 4.8,
     image: "https://ui-avatars.com/api/?name=Lakshmi+Devi&background=FFC0CB&color=800080&size=256"

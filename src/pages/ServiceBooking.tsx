@@ -235,7 +235,7 @@ const ServiceBooking = () => {
             arrivalTime: "30 mins",
             address: addresses.find(addr => addr.id === selectedAddress)?.address || "",
             maid: {
-              name: "Lakshmi D.",
+              name: "Nandini C.",
               rating: 4.8,
               imageUrl: ""
             }

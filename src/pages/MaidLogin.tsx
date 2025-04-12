@@ -128,7 +128,7 @@ const MaidLogin = () => {
         skoops: 230, // Initialize with some Skoops
         skoop_level: 3, // Initial level
         rating: 4.8,
-        name: "Lakshmi Devi"
+        name: "Nandini Chakaravarthy"
       }));
       
       toast({

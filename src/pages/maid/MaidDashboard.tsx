@@ -16,7 +16,7 @@ const MaidDashboard = () => {
   const { language } = useLanguage();
   const [isAvailable, setIsAvailable] = useState(true);
   const [maidData, setMaidData] = useState({
-    name: "Lakshmi Devi",
+    name: "Nandini Chakaravarthy",
     rating: 4.8,
     level: 3,
     jobsCompleted: 124,
@@ -84,7 +84,7 @@ const MaidDashboard = () => {
         if (maid) {
           setMaidData(prev => ({
             ...prev,
-            name: maid.name || "Lakshmi Devi",
+            name: maid.name || "Nandini Chakaravarthy",
             skoops: maid.skoops || 230,
             level: maid.skoop_level || 3,
             image: maid.image || prev.image

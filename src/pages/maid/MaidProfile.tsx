@@ -15,7 +15,7 @@ const MaidProfile = () => {
   // Get maid data from localStorage
   const storedMaid = localStorage.getItem("skoopa-maid");
   const initialMaid = storedMaid ? JSON.parse(storedMaid) : {
-    name: "Lakshmi Devi",
+    name: "Nandini Chakaravarthy",
     phoneNumber: "987654321",
     image: "https://ui-avatars.com/api/?name=Lakshmi+Devi&background=FFC0CB&color=800080&size=256"
   };

@@ -37,7 +37,7 @@ const FavoriteMaids = () => {
       const defaultMaids = [
         {
           id: "1",
-          name: "Lakshmi Devi",
+          name: "Nandini Chakaravarthy",
           rating: 4.8,
           image: "https://ui-avatars.com/api/?name=Lakshmi+Devi&background=FFC0CB&color=800080&size=256",
           jobsCompleted: 124,

@@ -27,7 +27,7 @@ const CHATS: ChatThread[] = [
   {
     id: "c1",
     maidName: "Geeta Singh",
-    maidImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3",
+    maidImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6Pe-T3yrHvJ7YHeOpsWZQSlXx9DC70k7kGg&s",
     lastMessage: "I'll be there at 9am tomorrow",
     time: "10:30 AM",
     unread: 2,
@@ -62,7 +62,7 @@ const CHATS: ChatThread[] = [
   {
     id: "c2",
     maidName: "Lakshmi R",
-    maidImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3",
+    maidImage: "https://irins.org/assets/profile_images/230614.jpg",
     lastMessage: "Thank you for your feedback!",
     time: "Yesterday",
     unread: 0,
