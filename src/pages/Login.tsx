@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -36,7 +37,14 @@ const Login = () => {
     // Check if user is already logged in
     const user = localStorage.getItem("skoopa-user");
     if (user) {
-      navigate("/");
+      try {
+        const userData = JSON.parse(user);
+        if (userData.isLoggedIn) {
+          navigate("/");
+        }
+      } catch (e) {
+        console.error("Error parsing user data", e);
+      }
     }
   }, [navigate]);
 
@@ -87,29 +95,34 @@ const Login = () => {
       }
       
       // Store dummy user info in localStorage
-      localStorage.setItem("skoopa-user", JSON.stringify({
+      const userData = {
         id: "dummy-user-id",
         email: loginMethod === "email" ? email : DUMMY_EMAIL,
         phoneNumber: loginMethod === "phone" ? phoneNumber : DUMMY_PHONE,
         isLoggedIn: true,
         skoops: 150, // Initialize with some Skoops
         skoop_level: 2, // Initial level
-      }));
+      };
+      
+      localStorage.setItem("skoopa-user", JSON.stringify(userData));
       
       toast({
         title: "Success",
         description: "Login successful",
       });
+
+      // First update the state then navigate
+      setLoading(false);
       
-      // Navigate to home page - removing setTimeout to fix automatic redirection
+      // Navigate to home page immediately 
       navigate("/");
+      
     } catch (error: any) {
       toast({
         title: "Error",
         description: error.message || "Authentication failed",
         variant: "destructive"
       });
-    } finally {
       setLoading(false);
     }
   };
