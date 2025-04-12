@@ -28,8 +28,14 @@ import RescheduleBooking from "./pages/RescheduleBooking";
 import TrackBooking from "./pages/TrackBooking";
 import ReviewBooking from "./pages/ReviewBooking";
 import PremiumMaids from "./pages/PremiumMaids";
-import { MyAddresses, FavoriteMaids, HelpSupport, AboutSkoopa } from "./pages/PlaceholderPages";
-import { DeepCleaning, DiwaliSpecial, MaidInsurance, KitchenCleaning } from "./pages/services";
+import MyAddresses from "./pages/MyAddresses";
+import FavoriteMaids from "./pages/FavoriteMaids";
+import HelpSupport from "./pages/HelpSupport";
+import AboutSkoopa from "./pages/AboutSkoopa";
+import DeepCleaning from "./pages/services/DeepCleaning";
+import DiwaliSpecial from "./pages/services/DiwaliSpecial";
+import MaidInsurance from "./pages/services/MaidInsurance";
+import KitchenCleaning from "./pages/services/KitchenCleaning";
 
 const queryClient = new QueryClient();
 
