@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { ToastProvider } from "@/hooks/use-toast";
 import Index from "./pages/Index";
 import SplashScreen from "./components/SplashScreen";
 import Login from "./pages/Login";
@@ -52,8 +53,10 @@ const App = () => {
     return (
       <QueryClientProvider client={queryClient}>
         <LanguageProvider>
-          <Toaster />
-          <SplashScreen onFinish={handleSplashFinish} />
+          <ToastProvider>
+            <Toaster />
+            <SplashScreen onFinish={handleSplashFinish} />
+          </ToastProvider>
         </LanguageProvider>
       </QueryClientProvider>
     );
@@ -62,36 +65,38 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <Toaster />
-        <BrowserRouter>
-          <Routes>
-            {/* Auth routes */}
-            <Route path="/login" element={isLoggedIn ? <Navigate to="/" /> : <Login />} />
-            <Route path="/maid-login" element={<MaidLogin />} />
-            
-            {/* Protected customer routes */}
-            <Route path="/" element={isLoggedIn ? <Index /> : <Navigate to="/login" />} />
-            <Route path="/bookings" element={isLoggedIn ? <Bookings /> : <Navigate to="/login" />} />
-            <Route path="/payments" element={isLoggedIn ? <Payments /> : <Navigate to="/login" />} />
-            <Route path="/chat" element={isLoggedIn ? <Chat /> : <Navigate to="/login" />} />
-            <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
-            <Route path="/notifications" element={isLoggedIn ? <Notifications /> : <Navigate to="/login" />} />
-            <Route path="/service/:serviceType" element={isLoggedIn ? <ServiceBooking /> : <Navigate to="/login" />} />
-            <Route path="/search" element={isLoggedIn ? <Search /> : <Navigate to="/login" />} />
-            <Route path="/settings" element={isLoggedIn ? <Settings /> : <Navigate to="/login" />} />
-            <Route path="/edit-location" element={isLoggedIn ? <EditLocation /> : <Navigate to="/login" />} />
-            <Route path="/add-payment-method" element={isLoggedIn ? <AddPaymentMethod /> : <Navigate to="/login" />} />
-            
-            {/* Maid interface routes */}
-            <Route path="/maid" element={<MaidDashboard />} />
-            <Route path="/maid/notifications" element={<MaidNotifications />} />
-            <Route path="/maid/profile" element={<MaidProfile />} />
-            <Route path="/maid/directions/:id" element={<JobDirections />} />
-            
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <ToastProvider>
+          <Toaster />
+          <BrowserRouter>
+            <Routes>
+              {/* Auth routes */}
+              <Route path="/login" element={isLoggedIn ? <Navigate to="/" /> : <Login />} />
+              <Route path="/maid-login" element={<MaidLogin />} />
+              
+              {/* Protected customer routes */}
+              <Route path="/" element={isLoggedIn ? <Index /> : <Navigate to="/login" />} />
+              <Route path="/bookings" element={isLoggedIn ? <Bookings /> : <Navigate to="/login" />} />
+              <Route path="/payments" element={isLoggedIn ? <Payments /> : <Navigate to="/login" />} />
+              <Route path="/chat" element={isLoggedIn ? <Chat /> : <Navigate to="/login" />} />
+              <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
+              <Route path="/notifications" element={isLoggedIn ? <Notifications /> : <Navigate to="/login" />} />
+              <Route path="/service/:serviceType" element={isLoggedIn ? <ServiceBooking /> : <Navigate to="/login" />} />
+              <Route path="/search" element={isLoggedIn ? <Search /> : <Navigate to="/login" />} />
+              <Route path="/settings" element={isLoggedIn ? <Settings /> : <Navigate to="/login" />} />
+              <Route path="/edit-location" element={isLoggedIn ? <EditLocation /> : <Navigate to="/login" />} />
+              <Route path="/add-payment-method" element={isLoggedIn ? <AddPaymentMethod /> : <Navigate to="/login" />} />
+              
+              {/* Maid interface routes */}
+              <Route path="/maid" element={<MaidDashboard />} />
+              <Route path="/maid/notifications" element={<MaidNotifications />} />
+              <Route path="/maid/profile" element={<MaidProfile />} />
+              <Route path="/maid/directions/:id" element={<JobDirections />} />
+              
+              {/* Catch-all route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </ToastProvider>
       </LanguageProvider>
     </QueryClientProvider>
   );
