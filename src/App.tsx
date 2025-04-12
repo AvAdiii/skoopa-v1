@@ -24,6 +24,38 @@ import Search from "./pages/Search";
 import Settings from "./pages/Settings";
 import MaidProfile from "./pages/maid/MaidProfile";
 import JobDirections from "./pages/maid/JobDirections";
+import RescheduleBooking from "./pages/RescheduleBooking";
+import TrackBooking from "./pages/TrackBooking";
+import ReviewBooking from "./pages/ReviewBooking";
+import PremiumMaids from "./pages/PremiumMaids";
+import { MyAddresses, FavoriteMaids, HelpSupport, AboutSkoopa } from "./pages/PlaceholderPages";
+import { DeepCleaning, DiwaliSpecial, MaidInsurance } from "./pages/services";
+
+// Create a netlify.toml file to handle SPA routing
+const netlifyConfig = `
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+`;
+
+// Create the netlify.toml file
+try {
+  if (typeof window !== 'undefined') {
+    // This code only runs in the browser
+    const fs = window.require && window.require('fs');
+    if (fs) {
+      fs.writeFileSync('netlify.toml', netlifyConfig);
+    }
+  }
+} catch (e) {
+  // Ignore errors, this is just a helper for Netlify deployment
+  console.log('Could not create netlify.toml file. This is expected in the browser.');
+}
 
 const queryClient = new QueryClient();
 
@@ -85,6 +117,19 @@ const App = () => {
               <Route path="/settings" element={isLoggedIn ? <Settings /> : <Navigate to="/login" />} />
               <Route path="/edit-location" element={isLoggedIn ? <EditLocation /> : <Navigate to="/login" />} />
               <Route path="/add-payment-method" element={isLoggedIn ? <AddPaymentMethod /> : <Navigate to="/login" />} />
+              <Route path="/reschedule-booking/:id" element={isLoggedIn ? <RescheduleBooking /> : <Navigate to="/login" />} />
+              <Route path="/track-booking/:id" element={isLoggedIn ? <TrackBooking /> : <Navigate to="/login" />} />
+              <Route path="/review-booking/:id" element={isLoggedIn ? <ReviewBooking /> : <Navigate to="/login" />} />
+              <Route path="/premium-maids" element={isLoggedIn ? <PremiumMaids /> : <Navigate to="/login" />} />
+              <Route path="/my-addresses" element={isLoggedIn ? <MyAddresses /> : <Navigate to="/login" />} />
+              <Route path="/favorite-maids" element={isLoggedIn ? <FavoriteMaids /> : <Navigate to="/login" />} />
+              <Route path="/help-support" element={isLoggedIn ? <HelpSupport /> : <Navigate to="/login" />} />
+              <Route path="/about" element={isLoggedIn ? <AboutSkoopa /> : <Navigate to="/login" />} />
+              
+              {/* Service pages */}
+              <Route path="/service/deep-cleaning" element={isLoggedIn ? <DeepCleaning /> : <Navigate to="/login" />} />
+              <Route path="/service/diwali-special" element={isLoggedIn ? <DiwaliSpecial /> : <Navigate to="/login" />} />
+              <Route path="/service/maid-insurance" element={isLoggedIn ? <MaidInsurance /> : <Navigate to="/login" />} />
               
               {/* Maid interface routes */}
               <Route path="/maid" element={<MaidDashboard />} />

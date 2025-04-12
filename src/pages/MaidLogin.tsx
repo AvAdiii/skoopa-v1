@@ -148,6 +148,10 @@ const MaidLogin = () => {
     }
   };
 
+  const handleBackClick = () => {
+    navigate("/login");
+  };
+
   return (
     <motion.div 
       className="min-h-screen bg-gradient-to-b from-white to-azure/30 px-4 pb-8 pt-12 flex flex-col"
@@ -161,7 +165,7 @@ const MaidLogin = () => {
       {/* Header */}
       <div className="flex items-center mb-8">
         <button 
-          onClick={() => navigate("/login")}
+          onClick={handleBackClick}
           className="mr-4 w-10 h-10 rounded-full flex items-center justify-center hover:bg-smoke/50"
         >
           <ArrowLeft size={20} className="text-charcoal" />

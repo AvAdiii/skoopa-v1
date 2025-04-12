@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,7 +10,6 @@ import UserGreeting from "@/components/UserGreeting";
 import ActiveBooking from "@/components/ActiveBooking";
 import SkoopsDisplay from "@/components/SkoopsDisplay";
 import CustomerBottomNav from "@/components/CustomerBottomNav";
-import SkoopsBenefits from "@/components/SkoopsBenefits";
 import SubscriptionSection from "@/components/SubscriptionSection";
 import AppHeader from "@/components/AppHeader";
 import { cn } from "@/lib/utils";
@@ -163,7 +163,21 @@ const Index = () => {
   };
 
   const handleServiceClick = (serviceId: string) => {
-    navigate(`/service/${serviceId}`);
+    // Map serviceId to corresponding routes
+    const serviceRoutes: Record<string, string> = {
+      'deep-cleaning': '/service/deep-cleaning',
+      'diwali-special': '/service/diwali-special',
+      'maid-insurance': '/service/maid-insurance',
+      'regular-cleaning': '/service/regular-cleaning',
+      'kitchen-cleaning': '/service/kitchen-cleaning'
+    };
+    
+    // Navigate to the appropriate route
+    if (serviceRoutes[serviceId]) {
+      navigate(serviceRoutes[serviceId]);
+    } else {
+      navigate(`/service/${serviceId}`);
+    }
   };
 
   const handleClearSearch = () => {
@@ -261,9 +275,6 @@ const Index = () => {
           >
             {/* Promo Carousel */}
             <PromoCarousel />
-
-            {/* Skoops Benefits */}
-            <SkoopsBenefits />
 
             {/* Quick Actions */}
             <QuickActions />

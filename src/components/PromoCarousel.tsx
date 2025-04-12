@@ -20,7 +20,7 @@ const promos: PromoSlide[] = [
     title: "Diwali Special",
     description: "Get 20% off on deep cleaning services",
     bgColor: "bg-gradient-to-r from-coral to-gold",
-    link: "/service/deep-cleaning",
+    link: "/service/diwali-special",
     actionText: "Book Now"
   },
   {
