@@ -26,7 +26,7 @@ const MaidDashboard = () => {
       week: "₹3,250",
       month: "₹12,500"
     },
-    image: "https://ui-avatars.com/api/?name=Lakshmi+Devi&background=FFC0CB&color=800080&size=256"
+    image: "/lovable-uploads/nandini.png"
   });
   
   const [upcomingJobs, setUpcomingJobs] = useState([
