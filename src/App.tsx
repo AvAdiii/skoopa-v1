@@ -49,7 +49,7 @@ const App = () => {
     if (user) {
       try {
         const userData = JSON.parse(user);
-        setIsLoggedIn(!!userData.isLoggedIn);
+        setIsLoggedIn(userData.isLoggedIn);
       } catch (e) {
         console.error("Error parsing user data", e);
       }
@@ -82,7 +82,7 @@ const App = () => {
           <BrowserRouter>
             <Routes>
               {/* Auth routes */}
-              <Route path="/login" element={isLoggedIn ? <Navigate to="/home" /> : <Login />} />
+              <Route path="/login" element={isLoggedIn ? <Navigate to="/home" /> : <Login setIsLoggedIn={setIsLoggedIn} />} />
               <Route path="/maid-login" element={<MaidLogin />} />
               
               {/* Protected customer routes */}

@@ -13,7 +13,7 @@ const DUMMY_PHONE = "123456789";
 const DUMMY_PASSWORD = "abcd1234";
 const DUMMY_EMAIL = "test@example.com";
 
-const Login = () => {
+const Login = ({ setIsLoggedIn }) => {
   const navigate = useNavigate();
   const [loginMethod, setLoginMethod] = useState<"phone" | "email">("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -113,7 +113,8 @@ const Login = () => {
 
       // First update the state then navigate
       setLoading(false);
-      
+
+      setIsLoggedIn(true);
       // Navigate to specific home page route immediately 
       navigate("/home");
       
