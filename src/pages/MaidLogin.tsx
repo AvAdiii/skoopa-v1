@@ -160,7 +160,6 @@ const MaidLogin = () => {
       transition={{ duration: 0.5 }}
     >
       {/* Background pattern */}
-      <div className="absolute top-0 left-0 w-full h-64 bg-indian-pattern opacity-10 z-0"></div>
       
       {/* Header */}
       <div className="flex items-center mb-8">
